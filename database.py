@@ -1,7 +1,8 @@
 from flask_mysqldb import MySQL
 
 
-class database:
+class SingletonDatabase:
+    __instance__ = None
 
     def __init__(self, app, hostip, user, password, dbname):
         app.config['MYSQL_HOST'] = hostip
@@ -11,8 +12,18 @@ class database:
 
         self.mysql = MySQL(app)
 
-    def getDatabase(self):
-        return self.mysql
+        if SingletonDatabase.__instance__ is None:
+            SingletonDatabase.__instance__ = self
+        else:
+            raise Exception("You cannot create another SingletonDatabase class")
+
+    @staticmethod
+    def get_instance():
+        """ Static method to fetch the current instance.
+        """
+        if not SingletonDatabase.__instance__:
+            SingletonDatabase()
+        return SingletonDatabase.__instance__
 
     def executeNonSelectQuery(self, query):
         cur = self.mysql.connection.cursor()

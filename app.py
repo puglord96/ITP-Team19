@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from database import database
+from database import SingletonDatabase
 
 app = Flask(__name__)
 
@@ -10,14 +10,16 @@ databaseUserName = 'root'
 databasePassword = 'sceptile101'
 databaseName = 'itpproject'
 
-database = database(app, databaseIP, databaseUserName, databasePassword, databaseName)
+database = SingletonDatabase(app, databaseIP, databaseUserName, databasePassword, databaseName)
+
+testDatabaseInstance = database.get_instance()
 
 
 
 @app.route('/')
 def hello_world():
+    testDatabaseInstance.executeNonSelectQuery("CREATE TABLE Persons (PersonID int, LastName varchar(255), FirstName varchar(255), Address varchar(255), City varchar(255)) ")
     return 'Hello World!'
-
 
 if __name__ == '__main__':
     app.run()
