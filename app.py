@@ -1,14 +1,17 @@
-from flask import Flask,render_template, request
+from flask import Flask, render_template, request
 from database import database
 
 app = Flask(__name__)
+
+# Update the settings of our database below
 
 databaseIP = 'localhost'
 databaseUserName = 'root'
 databasePassword = 'sceptile101'
 databaseName = 'itpproject'
 
-database = database(app,databaseIP,databaseUserName,databasePassword,databaseName)
+database = database(app, databaseIP, databaseUserName, databasePassword, databaseName)
+
 
 
 @app.route('/')
