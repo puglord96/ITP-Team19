@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--    <link rel="shortcut icon" href="../static/img/favicon.ico" type="image/x-icon">-->
+    <link rel="icon" href="../static/img/favicon.ico" type="image/x-icon">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="../static/code/highcharts.js"></script>
+    <script src="../static/code/modules/data.js"></script>
+    <script src="../static/code/modules/series-label.js"></script>
+    <script src="../static/code/modules/exporting.js"></script>
+    <script src="../static/code/modules/export-data.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='code/jquery.dataTables.css') }}">
+
+
+
+    <script src="http://code.highcharts.com/maps/modules/map.js"></script>
+
+    <!-- Additional files for the Highslide popup effect -->
+    <script src="https://www.highcharts.com/media/com_demo/js/highslide-full.min.js"></script>
+    <script src="https://www.highcharts.com/media/com_demo/js/highslide.config.js" charset="utf-8"></script>
+    <link rel="stylesheet" type="text/css" href="https://www.highcharts.com/media/com_demo/css/highslide.css" />
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+
+    <script src="../static/code/data.js"></script>
+    <script src="../static/code/exporting.js"></script>
+    <script src="../static/code/export-data.js"></script>
+    <script src="../static/code/Chart.js"></script>
+    <script src="../static/code/Globals.js"></script>
+    <script src="../static/code/graph.js"></script>
+    <script src = "../static/code/exporting.js"></script>
+    <script src = "../static/code/datatables.js"></script>
+
+
+    {% if title %}
+        <title>Communication Helpdesk - {{ title }}</title>
+    {% else %}
+        <title>Communication Helpdesk</title>
+    {% endif %}
+</head>
+<body>
+    <header class="site-header">
+      <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+        <div class="container">
+          <a class="navbar-brand mr-4" href="/">Communication Helpdesk</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarToggle">
+            <div class="navbar-nav mr-auto">
+              <a class="nav-item nav-link" href="{{ url_for('login') }}">Home</a>
+            </div>
+            <!-- Navbar Right Side -->
+            <div class="navbar-nav">
+
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main role="main" class="container">
+        <div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="jumbotron jumbotron-fluid" style="padding:20px;">
+                <div class="container">
+                    <h1 class="display-4">Welcome to Communications Helpdesk!</h1>
+                    <p class="lead">Communication Helpdesk is the service arm of the Centre for Communication Skills
+                        (CCS) that provides free consultations to students on their written assignments or oral
+                        presentations.
+                        Consultations may include one-on-one or small group tutoring.
+                    </p>
+                    <p>
+                    <hr class="my-4">
+                    <h3>BOOKING AN APPOINTMENT</h3>
+                    For students, please follow this link to login. You will need to be authenticated using your SIT
+                    email account.
+                    For more information on the helpdesk policy and updates, please refer to the Student Sharepoint or
+                    email us at <a href="mailto:ccs@singaporetech.edu.sg">ccs@singaporetech.edu.sg</a></p>
+                </div>
+            </div>
+        </div>
+          {% block content %}{% endblock %}
+    </main>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>

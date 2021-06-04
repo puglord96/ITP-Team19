@@ -7,7 +7,8 @@ app = Flask(__name__)
 
 databaseIP = 'localhost'
 databaseUserName = 'root'
-databasePassword = 'sceptile101'
+# databasePassword = 'sceptile101'
+databasePassword = ''
 databaseName = 'itpproject'
 
 database = SingletonDatabase(app, databaseIP, databaseUserName, databasePassword, databaseName)
@@ -17,9 +18,20 @@ testDatabaseInstance = database.get_instance()
 
 
 @app.route('/')
-def hello_world():
-    testDatabaseInstance.executeNonSelectQuery("CREATE TABLE Persons (PersonID int, LastName varchar(255), FirstName varchar(255), Address varchar(255), City varchar(255)) ")
-    return 'Hello World!'
+def login():
+    testDatabaseInstance.executeNonSelectQuery("CREATE TABLE IF NOT EXISTS itpproject.Persons (PersonID int, LastName varchar(255), FirstName varchar(255), Address varchar(255), City varchar(255)) ")
+    return render_template('login.html')
+
+
+@app.route('/forgot_password')
+def forgot_password():
+    return render_template('forgot_password.html')
+
+
+@app.route('/register')
+def register():
+    return render_template('register.html')
+
 
 if __name__ == '__main__':
     app.run()
