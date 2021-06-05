@@ -12,13 +12,21 @@ databaseName = 'itp'
 
 database = SingletonDatabase(app, databaseIP, databaseUserName, databasePassword, databaseName)
 
-testDatabaseInstance = database.get_instance()
+DatabaseInstance = database.get_instance()
 
 
 
-@app.route('/')
+@app.route('/',methods=['GET','POST'])
 def login():
-    testDatabaseInstance.executeNonSelectQuery("CREATE TABLE IF NOT EXISTS itp.Persons (PersonID int, LastName varchar(255), FirstName varchar(255), Address varchar(255), City varchar(255)) ")
+    userlist = DatabaseInstance.executeSelectQuery("Select email,password from user")
+
+
+    if request.method == "POST":
+        formEmail = request.form.get('email')
+        formPassword = request.form.get('password')
+        for user in userlist:
+            if formEmail == user[0] and formPassword == user[1]:
+                pass #redirect to homepage
     return render_template('login.html')
 
 

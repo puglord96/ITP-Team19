@@ -36,7 +36,7 @@ class SingletonDatabase:
         self.mysql.connection.commit()
         cur.close()
 
-    def executeSelectQuery(self,query):
+    def executeSelectQuery(self, query):
         cur = self.mysql.connection.cursor()
         cur.execute(query)
         myresult = cur.fetchall()
