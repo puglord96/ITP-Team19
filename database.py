@@ -1,6 +1,10 @@
 from flask import Flask
 from flask_mysqldb import MySQL
 
+"""
+In your main program, create an instance of the SingletonDatabase class before assessing its functions
+"""
+
 
 class SingletonDatabase:
     __instance__ = None

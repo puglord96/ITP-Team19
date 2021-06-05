@@ -5,11 +5,10 @@ app = Flask(__name__)
 
 # Update the settings of our database below
 
-databaseIP = 'localhost'
-databaseUserName = 'root'
-# databasePassword = 'sceptile101'
-databasePassword = ''
-databaseName = 'itpproject'
+databaseIP = 'itp.ckmrtwiqitmd.ap-southeast-1.rds.amazonaws.com'
+databaseUserName = 'admin'
+databasePassword = 'iloveitp'
+databaseName = 'itp'
 
 database = SingletonDatabase(app, databaseIP, databaseUserName, databasePassword, databaseName)
 
@@ -19,7 +18,7 @@ testDatabaseInstance = database.get_instance()
 
 @app.route('/')
 def login():
-    testDatabaseInstance.executeNonSelectQuery("CREATE TABLE IF NOT EXISTS itpproject.Persons (PersonID int, LastName varchar(255), FirstName varchar(255), Address varchar(255), City varchar(255)) ")
+    testDatabaseInstance.executeNonSelectQuery("CREATE TABLE IF NOT EXISTS itp.Persons (PersonID int, LastName varchar(255), FirstName varchar(255), Address varchar(255), City varchar(255)) ")
     return render_template('login.html')
 
 
