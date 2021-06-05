@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from database import SingletonDatabase
 
 app = Flask(__name__)
@@ -24,8 +24,11 @@ def login():
     if request.method == "POST":
         formEmail = request.form.get('email')
         formPassword = request.form.get('password')
+
         for user in userlist:
+
             if formEmail == user[0] and formPassword == user[1]:
+                print("user found")
                 pass #redirect to homepage
     return render_template('login.html')
 
