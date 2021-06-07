@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 from database import SingletonDatabase
+from user import user
 
 app = Flask(__name__)
 
@@ -12,13 +13,15 @@ databaseName = 'itp'
 
 database = SingletonDatabase(app, databaseIP, databaseUserName, databasePassword, databaseName)
 
-DatabaseInstance = database.get_instance()
 
+DatabaseInstance = database.get_instance()
+UserInstance = user().get_instance()
 
 
 @app.route('/',methods=['GET','POST'])
 def login():
-    userlist = DatabaseInstance.executeSelectQuery("Select email,password from user")
+    userlist = DatabaseInstance.executeSelectMultipleQuery("Select email,password from user")
+
 
 
     if request.method == "POST":
@@ -28,10 +31,26 @@ def login():
         for user in userlist:
 
             if formEmail == user[0] and formPassword == user[1]:
-                print("user found")
-                pass #redirect to homepage
+                userRole = DatabaseInstance.executeSelectOneQuery("SELECT ut.description from user as u,usertype as ut where u.usertype = ut.usertypeid and u.email = '" + user[0]+"'")[0]
+
+                UserInstance.setRole(userRole.lower())
+                print(userRole)
+                print("user found:" + user[0])
+                return redirect('/home')
     return render_template('login.html')
 
+
+@app.route('/home')
+def home():
+    userRole = UserInstance.getRole()
+    if userRole == "admin":
+        return render_template('admin_test.html')
+    elif userRole == "tutee":
+        return render_template('tutee_test.html')
+    elif userRole == "tutor":
+        return render_template('tutor_test.html')
+    else:
+        return render_template('error_page.html')
 
 @app.route('/forgot_password')
 def forgot_password():
@@ -41,6 +60,8 @@ def forgot_password():
 @app.route('/register')
 def register():
     return render_template('register.html')
+
+
 
 
 if __name__ == '__main__':
