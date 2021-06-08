@@ -47,3 +47,14 @@ class SingletonDatabase:
         cur.execute(query)
         myresult = cur.fetchone()
         return myresult
+
+    def executeInsertQuery(self, query, values):
+        try:
+            cur = self.mysql.connection.cursor()
+            cur.execute(query, values)
+            self.mysql.connection.commit()
+            cur.close()
+            return True
+        except Exception as e:
+            print("Problem inserting into database: " + str(e))
+            return False
