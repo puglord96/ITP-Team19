@@ -2,13 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="548e18fe-eee7-4b69-83f9-76b6966b4a12" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/templates/admin_test.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/tutee_test.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/tutor_test.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/user.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/database.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -110,6 +104,9 @@
       <updated>1622644746382</updated>
       <workItem from="1622865639868" duration="4253000" />
       <workItem from="1623035992177" duration="1960000" />
+      <workItem from="1623246901214" duration="84000" />
+      <workItem from="1623389474091" duration="1276000" />
+      <workItem from="1623817004719" duration="664000" />
     </task>
     <servers />
   </component>
@@ -152,6 +149,6 @@
     <state width="1877" height="282" key="GridCell.Tab.0.right/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1622886310778" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/ITP_Team19$ITP_Team19.coverage" NAME="ITP-Team19 Coverage Results" MODIFIED="1623038126429" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/ITP_Team19$ITP_Team19.coverage" NAME="ITP-Team19 Coverage Results" MODIFIED="1623389535466" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>
