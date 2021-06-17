@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from database import SingletonDatabase
 from user import user
+from scripts import tutee_calendar
 
 app = Flask(__name__)
 
@@ -13,16 +14,13 @@ databaseName = 'itp'
 
 database = SingletonDatabase(app, databaseIP, databaseUserName, databasePassword, databaseName)
 
-
 DatabaseInstance = database.get_instance()
 UserInstance = user().get_instance()
 
 
-@app.route('/',methods=['GET','POST'])
+@app.route('/', methods=['GET', 'POST'])
 def login():
     userlist = DatabaseInstance.executeSelectMultipleQuery("Select email,password from user")
-
-
 
     if request.method == "POST":
         formEmail = request.form.get('email')
@@ -31,7 +29,9 @@ def login():
         for user in userlist:
 
             if formEmail == user[0] and formPassword == user[1]:
-                userRole = DatabaseInstance.executeSelectOneQuery("SELECT ut.description from user as u,usertype as ut where u.usertype = ut.usertypeid and u.email = '" + user[0]+"'")[0]
+                userRole = DatabaseInstance.executeSelectOneQuery(
+                    "SELECT ut.description from user as u,usertype as ut where u.usertype = ut.usertypeid and u.email = '" +
+                    user[0] + "'")[0]
 
                 UserInstance.setRole(userRole.lower())
                 print(userRole)
@@ -46,11 +46,13 @@ def home():
     if userRole == "admin":
         return render_template('admin_test.html')
     elif userRole == "tutee":
-        return render_template('tutee_test.html')
+        return render_template('tutee_home.html', calendar_requests=tutee_calendar.calendar_requests,
+                               calendar_upcomings=tutee_calendar.calendar_upcomings)
     elif userRole == "tutor":
         return render_template('tutor_test.html')
     else:
         return render_template('error_page.html')
+
 
 @app.route('/forgot_password')
 def forgot_password():
@@ -60,8 +62,6 @@ def forgot_password():
 @app.route('/register')
 def register():
     return render_template('register.html')
-
-
 
 
 if __name__ == '__main__':

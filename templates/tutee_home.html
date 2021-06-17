@@ -1,0 +1,74 @@
+{% extends "tutee_layout.html" %}
+{% block content %}
+<main role="main" class="container-fluid">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <h3>Upcoming Meetings</h3>
+                <div class="jumbotron jumbotron-fluid" style="padding:20px;">
+                    <a href="#">View all upcoming meetings</a>
+                    <div class='container-fluid' id="calendar">
+
+
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <h3>Meeting Requests</h3>
+                <div class="jumbotron jumbotron-fluid" style="padding:20px;">
+                    <a href="#">View all tutoring requests</a>
+                    <div class='container-fluid' id="calendar_request">
+
+
+                    </div>
+                    <script>
+                    let calendarEl = document.getElementById('calendar');
+                    let calendar = new FullCalendar.Calendar(calendarEl, {
+                    events: [
+                        {% for calendar_upcoming in calendar_upcomings %}
+                        {
+                        title : '{{ calendar_upcoming.todo }}',
+                        start : '{{ calendar_upcoming.date }}',
+                        url: '{{ calendar_upcoming.zoom_link }}'
+                        },
+                        {% endfor %}
+                    ],
+                        eventClick: function(info){
+                        <!-- prevent default prevents redirecting to the URL-->
+                            info.jsEvent.preventDefault();
+                            alert('Event: ' + info.event.title);
+                            alert('Start: ' + info.event.start);
+                            alert('Zoom Link: ' + info.event.url);
+                    }
+                    });
+                    calendar.render();
+
+
+                    let calendarEl_request = document.getElementById('calendar_request');
+                    let calendar_request = new FullCalendar.Calendar(calendarEl_request, {
+                    events: [
+                        {% for calendar_request in calendar_requests %}
+                        {
+                        title : '{{ calendar_request.todo }}',
+                        start : '{{ calendar_request.date }}',
+                        url: '{{ calendar_request.zoom_link }}'
+                        },
+                        {% endfor %}
+                    ],
+                        eventClick: function(info){
+                        <!-- prevent default prevents redirecting to the URL-->
+                        info.jsEvent.preventDefault();
+                        alert('Event: ' + info.event.title);
+                        alert('Start: ' + info.event.start);
+                        alert('Zoom Link: ' + info.event.url);
+                    }
+                    });
+                    calendar_request.render();
+
+
+                    </script>
+                </div>
+            </div>
+        </div>
+
+        {% endblock content %}
