@@ -2,8 +2,10 @@ from flask import Flask, render_template, request, redirect, url_for
 from database import SingletonDatabase
 from user import user
 from scripts import tutee_calendar
+from pyzoom import ZoomClient
 
 app = Flask(__name__)
+client = ZoomClient('0Q8s81KuT_2jFfxq3HYPNQ', 'IGZG9x2f4T4Z7JWfnkELg3sbRDg8YctQ5Ajp')
 
 # Update the settings of our database below
 
