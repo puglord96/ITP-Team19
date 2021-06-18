@@ -2,7 +2,7 @@ import abc
 from abc import ABC
 
 
-class User(ABC):
+class User:
     def __init__(self, UserDetails):
         self.details = UserDetails
 
