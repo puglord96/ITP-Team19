@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="548e18fe-eee7-4b69-83f9-76b6966b4a12" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/UserFactory.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/UserSingleton.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,7 +14,6 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="HTML File" />
-        <option value="JavaScript File" />
         <option value="Python Script" />
       </list>
     </option>
@@ -36,7 +32,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/static" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/templates" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -47,6 +43,7 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\z\Documents\GitHub\ITP-Team19\templates" />
       <recent name="C:\Users\z\Documents\GitHub\ITP-Team19\static" />
     </key>
   </component>
@@ -58,9 +55,9 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="" />
+      <option name="SDK_HOME" value="C:\Users\z\PycharmProjects\CommunicationHelpdesk\venv\Scripts\python.exe" />
       <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="true" />
+      <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
@@ -96,8 +93,8 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.app" />
       <item itemvalue="Python.ITP-Team19" />
+      <item itemvalue="Python.app" />
     </list>
   </component>
   <component name="SpellCheckerSettings" BundledDictionaries="0" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="application-level" UseSingleDictionary="true" />
@@ -113,11 +110,6 @@
       <updated>1622644746382</updated>
       <workItem from="1622865639868" duration="4253000" />
       <workItem from="1623035992177" duration="1960000" />
-      <workItem from="1623246901214" duration="84000" />
-      <workItem from="1623389474091" duration="1276000" />
-      <workItem from="1623817004719" duration="4500000" />
-      <workItem from="1623912347519" duration="5696000" />
-      <workItem from="1623993653792" duration="6329000" />
     </task>
     <servers />
   </component>
