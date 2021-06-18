@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for
 from database import SingletonDatabase
-from user import user
+from UserSingleton import UserSingleton
 from scripts import tutee_calendar
 from pyzoom import ZoomClient
+from UserFactory import *
 
 app = Flask(__name__)
 client = ZoomClient('0Q8s81KuT_2jFfxq3HYPNQ', 'IGZG9x2f4T4Z7JWfnkELg3sbRDg8YctQ5Ajp')
@@ -17,7 +18,8 @@ databaseName = 'itp'
 database = SingletonDatabase(app, databaseIP, databaseUserName, databasePassword, databaseName)
 
 DatabaseInstance = database.get_instance()
-UserInstance = user().get_instance()
+UserInstance = UserSingleton().get_instance()
+UserFactory = UserFactory()
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -29,28 +31,29 @@ def login():
         formPassword = request.form.get('password')
 
         for user in userlist:
-
             if formEmail == user[0] and formPassword == user[1]:
-                userRole = DatabaseInstance.executeSelectOneQuery(
-                    "SELECT ut.description from user as u,usertype as ut where u.usertype = ut.usertypeid and u.email = '" +
-                    user[0] + "'")[0]
+                userDetailList = DatabaseInstance.getDetailListOfUser(formEmail)
 
-                UserInstance.setRole(userRole.lower())
-                print(userRole)
-                print("user found:" + user[0])
+
+                user = UserFactory.createUser(userDetailList)
+
+                UserInstance.setUser(user)
+
+                print(user.getUserRole())
+
                 return redirect('/home')
     return render_template('login.html')
 
 
 @app.route('/home')
 def home():
-    userRole = UserInstance.getRole()
-    if userRole == "admin":
+    userRole = UserInstance.getUser().getUserRole()
+    if userRole == 1:
         return render_template('admin_test.html')
-    elif userRole == "tutee":
+    elif userRole == 2:
         return render_template('tutee_home.html', calendar_requests=tutee_calendar.calendar_requests,
                                calendar_upcomings=tutee_calendar.calendar_upcomings)
-    elif userRole == "tutor":
+    elif userRole == 3:
         return render_template('tutor_test.html')
     else:
         return render_template('error_page.html')

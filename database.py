@@ -30,6 +30,18 @@ class SingletonDatabase:
             SingletonDatabase()
         return SingletonDatabase.__instance__
 
+    def getDetailListOfAllUsers(self):
+        cur = self.mysql.connection.cursor()
+        cur.execute("Select * from users")
+        myresult = cur.fetchall()
+        return myresult
+
+    def getDetailListOfUser(self, email):
+        cur = self.mysql.connection.cursor()
+        cur.execute("SELECT * FROM user where email = '" + email+"'")
+        myresult = cur.fetchone()
+        return myresult
+
     def executeNonSelectQuery(self, query):
         cur = self.mysql.connection.cursor()
         cur.execute(query)
