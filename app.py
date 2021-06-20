@@ -25,11 +25,9 @@ UserFactory = UserFactory()
 @app.route('/', methods=['GET', 'POST'])
 def login():
     userlist = DatabaseInstance.executeSelectMultipleQuery("Select email,password from user")
-
     if request.method == "POST":
         formEmail = request.form.get('email')
         formPassword = request.form.get('password')
-
         for user in userlist:
             if formEmail == user[0] and formPassword == user[1]:
                 userDetailList = DatabaseInstance.getDetailListOfUser(formEmail)
@@ -64,8 +62,20 @@ def forgot_password():
     return render_template('forgot_password.html')
 
 
-@app.route('/register')
+@app.route('/register', methods=['GET','POST'])
 def register():
+    if request.method == "POST":
+        formEmail = request.form.get('email')
+        formPassword = request.form.get('password')
+        formUserType = 2
+        formFirstName = request.form.get('firstName')
+        formLastName = request.form.get('lastName')
+        formFaculty = request.form.get('faculty')
+        formDegree = request.form.get('pursuingDegree')
+        formGradYear = request.form.get('gradyear')
+        DatabaseInstance.executeInsertQuery("INSERT INTO user(email, password, usertype, firstname, lastname, faculty, degree, graduationyear) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", [formEmail, formPassword, formUserType, formFirstName, formLastName, formFaculty, formDegree, formGradYear])
+        return redirect('/')
+
     return render_template('register.html')
 
 

@@ -60,22 +60,22 @@
 <main role="main" class="container">
     <div class="jumbotron jumbotron-fluid" style="padding:20px;">
         <div class="container">
-            <form>
+            <form method="POST">
                 <div class="row"><h3>Register for new account</h3></div>
                 <div class="row" style="padding-top: 20px;">
                     <div class="col">
                         <h6>Email<span style='color:red;'>*</span></h6>
-                        <input type="email" class="form-control" placeholder="1234567@sit.singaporetech.edu.sg">
+                        <input type="email" class="form-control" placeholder="1234567@sit.singaporetech.edu.sg" name="email">
                     </div>
                 </div>
                 <div class="row" style="padding-top: 20px;">
                     <div class="col">
                         <h6>First Name<span style='color:red;'>*</span></h6>
-                        <input type="text" class="form-control" placeholder="John">
+                        <input type="text" class="form-control" placeholder="John" name="firstName">
                     </div>
                     <div class="col">
                         <h6>Last Name<span style='color:red;'>*</span></h6>
-                        <input type="text" class="form-control" placeholder="Smith">
+                        <input type="text" class="form-control" placeholder="Smith" name="lastName">
                     </div>
                 </div>
                 <div class="row" style="padding-top: 20px;">
@@ -190,22 +190,22 @@
                 <div class="row" style="padding-top: 20px;">
                     <div class="col">
                         <h6>Password<span style='color:red;'>*</span></h6>
-                        <input type="password" class="form-control" placeholder="8 - 16 characters long">
+                        <input type="password" class="form-control" placeholder="8 - 16 characters long" name="password">
                     </div>
                     <div class="col">
                         <h6>Confirm Password<span style='color:red;'>*</span></h6>
                         <input type="password" class="form-control" placeholder="Password">
                     </div>
                 </div>
-                <div class="row" style="padding-top: 20px;">
+                <!-- <div class="row" style="padding-top: 20px;">
                     <div class="col">
-                        <h6>Making sure you are human<span style='color:red;'>*</span></h6>    
+                        <h6>Making sure you are human<span style='color:red;'>*</span></h6>
                         <div class="g-recaptcha" data-sitekey="6LcV-w8bAAAAAOAGwTJUhplhzp4XkwJKvnIV6Ipt"></div>
                     </div>
-                </div>
+                </div> -->
                 <div class="row" style="padding-top: 20px;">
                     <div class="col">
-                        <button type="submit" class="btn btn-primary mb-3">Sign In</button>
+                        <button type="submit" class="btn btn-primary mb-3">Sign Up</button>
                     </div>
                 </div>
             </form>
