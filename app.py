@@ -32,7 +32,6 @@ def login():
             if formEmail == user[0] and formPassword == user[1]:
                 userDetailList = DatabaseInstance.getDetailListOfUser(formEmail)
 
-
                 user = UserFactory.createUser(userDetailList)
 
                 UserInstance.setUser(user)
@@ -46,15 +45,14 @@ def login():
 @app.route('/home')
 def home():
     userRole = UserInstance.getUser().getUserRole()
-    if userRole == 1:
-        return render_template('admin_test.html')
-    elif userRole == 2:
-        return render_template('tutee_home.html', calendar_requests=tutee_calendar.calendar_requests,
-                               calendar_upcomings=tutee_calendar.calendar_upcomings)
-    elif userRole == 3:
-        return render_template('tutor_test.html')
-    else:
-        return render_template('error_page.html')
+
+    switch = {
+        1: render_template('admin_test.html'),
+        2: render_template('tutee_home.html', calendar_requests=tutee_calendar.calendar_requests,
+                           calendar_upcomings=tutee_calendar.calendar_upcomings),
+        3: render_template('tutor_test.html')
+    }
+    return switch.get(userRole, render_template('error_page.html'))
 
 
 @app.route('/forgot_password')
