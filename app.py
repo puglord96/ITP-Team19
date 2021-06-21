@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
+from flask import jsonify
 from database import SingletonDatabase
 from UserSingleton import UserSingleton
 from scripts import tutee_calendar
@@ -74,8 +75,19 @@ def register():
         DatabaseInstance.executeInsertQuery("INSERT INTO user(email, password, usertype, firstname, lastname, faculty, degree, graduationyear) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", [formEmail, formPassword, formUserType, formFirstName, formLastName, formFaculty, formDegree, formGradYear])
         return redirect('/')
 
-    return render_template('register.html')
+    facultyList = DatabaseInstance.executeSelectMultipleQuery('SELECT * FROM faculty ORDER BY FacultyID ASC')
+    return render_template('register.html', facultyList=facultyList)
 
+@app.route('/register/faculty/<Faculty>')
+def DegreeByFaculty(Faculty):
+    degreeList = DatabaseInstance.executeSelectMultipleQueryWithParameters('SELECT * FROM degree WHERE FacultyID = (%s) ORDER BY DegreeID ASC', [Faculty])
+    degreeArray = []
+    for row in degreeList:
+        degreeOjb = {}
+        degreeOjb['id'] = row[0]
+        degreeOjb['name'] = row[2]
+        degreeArray.append(degreeOjb)
+    return jsonify({'degreeList': degreeArray})
 
 if __name__ == '__main__':
     app.run()
