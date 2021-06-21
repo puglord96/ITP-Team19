@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
     <!--    <link rel="shortcut icon" href="../static/img/favicon.ico" type="image/x-icon">-->
     <link rel="icon" href="../static/img/favicon.ico" type="image/x-icon">
@@ -23,10 +24,10 @@
     <!-- Additional files for the Highslide popup effect -->
     <script src="https://www.highcharts.com/media/com_demo/js/highslide-full.min.js"></script>
     <script src="https://www.highcharts.com/media/com_demo/js/highslide.config.js" charset="utf-8"></script>
-    <link rel="stylesheet" type="text/css" href="https://www.highcharts.com/media/com_demo/css/highslide.css"/>
+    <link rel="stylesheet" type="text/css" href="https://www.highcharts.com/media/com_demo/css/highslide.css" />
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
 
     <script src="../static/code/data.js"></script>
@@ -45,184 +46,133 @@
     <title>Communication Helpdesk</title>
     {% endif %}
 </head>
-<body>
-<header class="site-header">
-    <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
-        <div class="container">
-            <a class="navbar-brand mr-4" href="/">Communication Helpdesk</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle"
-                    aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-        </div>
-    </nav>
-</header>
-<main role="main" class="container">
-    <div class="jumbotron jumbotron-fluid" style="padding:20px;">
-        <div class="container">
-            <form method="POST">
-                <div class="row"><h3>Register for new account</h3></div>
-                <div class="row" style="padding-top: 20px;">
-                    <div class="col">
-                        <h6>Email<span style='color:red;'>*</span></h6>
-                        <input type="email" class="form-control" placeholder="1234567@sit.singaporetech.edu.sg" name="email">
-                    </div>
-                </div>
-                <div class="row" style="padding-top: 20px;">
-                    <div class="col">
-                        <h6>First Name<span style='color:red;'>*</span></h6>
-                        <input type="text" class="form-control" placeholder="John" name="firstName">
-                    </div>
-                    <div class="col">
-                        <h6>Last Name<span style='color:red;'>*</span></h6>
-                        <input type="text" class="form-control" placeholder="Smith" name="lastName">
-                    </div>
-                </div>
-                <div class="row" style="padding-top: 20px;">
-                    <div class="col">
-                        <h6>Mobile Number<span style='color:red;'>*</span></h6>
-                        <input type="text"
-                               oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
-                               maxlength="8" class="form-control" id="mobileNumber" name="mobileNumber"
-                               placeholder="12345678">
-                    </div>
-                    <div class="col">
-                        <h6>Graduation Year<span style='color:red;'>*</span></h6>
-                        <input type="text"
-                               oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
-                               placeholder="2022" class="form-control" id="gradyear" name="gradyear"
-                               maxlength="4">
-                    </div>
-                </div>
-                <div class="row" style="padding-top: 20px;">
-                    <div class="col">
-                        <h6>Cluster<span style='color:red;'>*</span></h6>
-                        <select class="form-control" name="faculty">
-                            <option value="" selected="">-- please select --</option>
-                            <option value="Design and Specialized Businesses">Design and Specialized Businesses</option>
-                            <option value="Chemical Engineering and Food Tech">Chemical Engineering and Food Tech
-                            </option>
-                            <option value="Engineering">Engineering</option>
-                            <option value="Health and Social Sciences">Health and Social Sciences</option>
-                            <option value="Information Communication Technology (ICT)">Information Communication
-                                Technology (ICT)
-                            </option>
 
-                        </select>
+<body>
+    <header class="site-header">
+        <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+            <div class="container">
+                <a class="navbar-brand mr-4" href="/">Communication Helpdesk</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle"
+                    aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </nav>
+    </header>
+    <main role="main" class="container">
+        <div class="jumbotron jumbotron-fluid" style="padding:20px;">
+            <div class="container">
+                <form method="POST">
+                    <div class="row">
+                        <h3>Register for new account</h3>
                     </div>
-                    <div class="col">
-                        <h6>Pursuing Degree<span style='color:red;'>*</span></h6>
-                        <select class="form-control" name="pursuingDegree">
-                            <option value="" selected="">-- please select --</option>
-                            <option value="Accountancy">Accountancy</option>
-                            <option value="Aeronautical Engineering (UoG)">Aeronautical Engineering (UoG)</option>
-                            <option value="Aerospace Engineering">Aerospace Engineering</option>
-                            <option value="Aerospace Systems (UoG)">Aerospace Systems (UoG)</option>
-                            <option value="Air Transport Management">Air Transport Management</option>
-                            <option value="Aircraft Systems Engineering">Aircraft Systems Engineering</option>
-                            <option value="Chemical Engineering">Chemical Engineering</option>
-                            <option value="Civil Engineering">Civil Engineering</option>
-                            <option value="Communication Design (GSA)">Communication Design (GSA)</option>
-                            <option value="Computer Science and Game Design (DigiPen)">Computer Science and Game Design
-                                (DigiPen)
-                            </option>
-                            <option value="Computer Science in Interactive Media and Game Development">Computer Science
-                                in Interactive Media and Game Development
-                            </option>
-                            <option value="Computer Science in Real-Time Interactive Simulation (DigiPen)">Computer
-                                Science in Real-Time Interactive Simulation (DigiPen)
-                            </option>
-                            <option value="Computing Science (UoG)">Computing Science (UoG)</option>
-                            <option value="Criminology and Security (UoL)">Criminology and Security (UoL)</option>
-                            <option value="Diagnostic Radiography">Diagnostic Radiography</option>
-                            <option value="Dietetics and Nutrition">Dietetics and Nutrition</option>
-                            <option value="Digital Art and Animation (DigiPen)">Digital Art and Animation (DigiPen)
-                            </option>
-                            <option value="Digital Communications and Integrated Media">Digital Communications and
-                                Integrated Media
-                            </option>
-                            <option value="Electrical Engineering &amp; Information Technology (TUM)">Electrical
-                                Engineering &amp; Information Technology (TUM)
-                            </option>
-                            <option value="Electrical Power Engineering">Electrical Power Engineering</option>
-                            <option value="Electronics and Data Engineering">Electronics and Data Engineering</option>
-                            <option value="Food Business Management (CIA)">Food Business Management (CIA)</option>
-                            <option value="Food Technology">Food Technology</option>
-                            <option value="Game Design (DigiPen)">Game Design (DigiPen)</option>
-                            <option value="Hospitality Business">Hospitality Business</option>
-                            <option value="Information and Communications Technology (Information Security)">Information
-                                and Communications Technology (Information Security)
-                            </option>
-                            <option value="Information and Communications Technology (Software Engineering)">Information
-                                and Communications Technology (Software Engineering)
-                            </option>
-                            <option value="Interior Design (GSA)">Interior Design (GSA)</option>
-                            <option value="Marine Engineering">Marine Engineering</option>
-                            <option value="Mechanical Design and Manufacturing Engineering">Mechanical Design and
-                                Manufacturing Engineering
-                            </option>
-                            <option value="Mechanical Design Engineering (UoG)">Mechanical Design Engineering (UoG)
-                            </option>
-                            <option value="Mechatronics (UoG)">Mechatronics (UoG)</option>
-                            <option value="Naval Architecture">Naval Architecture</option>
-                            <option value="Nursing">Nursing</option>
-                            <option value="Occupational Therapy">Occupational Therapy</option>
-                            <option value="Offshore Engineering">Offshore Engineering</option>
-                            <option value="Pharmaceutical Engineering">Pharmaceutical Engineering</option>
-                            <option value="Physiotherapy">Physiotherapy</option>
-                            <option value="Radiation Therapy">Radiation Therapy</option>
-                            <option value="Speech and Language Therapy">Speech and Language Therapy</option>
-                            <option value="Sustainable Infrastructure Engineering (Building Services)">Sustainable
-                                Infrastructure Engineering (Building Services)
-                            </option>
-                            <option value="Sustainable Infrastructure Engineering (Land)">Sustainable Infrastructure
-                                Engineering (Land)
-                            </option>
-                            <option value="Systems Engineering (ElectroMechanical Systems)">Systems Engineering
-                                (ElectroMechanical Systems)
-                            </option>
-                            <option value="Telematics (Intelligent Transportation Systems Engineering)">Telematics
-                                (Intelligent Transportation Systems Engineering)
-                            </option>
-                        </select>
+                    <div class="row" style="padding-top: 20px;">
+                        <div class="col">
+                            <h6>Email<span style='color:red;'>*</span></h6>
+                            <input type="email" class="form-control" placeholder="1234567@sit.singaporetech.edu.sg"
+                                name="email">
+                        </div>
                     </div>
-                </div>
-                <div class="row" style="padding-top: 20px;">
-                    <div class="col">
-                        <h6>Password<span style='color:red;'>*</span></h6>
-                        <input type="password" class="form-control" placeholder="8 - 16 characters long" name="password">
+                    <div class="row" style="padding-top: 20px;">
+                        <div class="col">
+                            <h6>First Name<span style='color:red;'>*</span></h6>
+                            <input type="text" class="form-control" placeholder="John" name="firstName">
+                        </div>
+                        <div class="col">
+                            <h6>Last Name<span style='color:red;'>*</span></h6>
+                            <input type="text" class="form-control" placeholder="Smith" name="lastName">
+                        </div>
                     </div>
-                    <div class="col">
-                        <h6>Confirm Password<span style='color:red;'>*</span></h6>
-                        <input type="password" class="form-control" placeholder="Password">
+                    <div class="row" style="padding-top: 20px;">
+                        <div class="col">
+                            <h6>Mobile Number<span style='color:red;'>*</span></h6>
+                            <input type="text"
+                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+                                maxlength="8" class="form-control" id="mobileNumber" name="mobileNumber"
+                                placeholder="12345678">
+                        </div>
+                        <div class="col">
+                            <h6>Graduation Year<span style='color:red;'>*</span></h6>
+                            <input type="text"
+                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+                                placeholder="2022" class="form-control" id="gradyear" name="gradyear" maxlength="4">
+                        </div>
                     </div>
-                </div>
-                <!-- <div class="row" style="padding-top: 20px;">
+                    <div class="row" style="padding-top: 20px;">
+                        <div class="col">
+                            <h6>Cluster<span style='color:red;'>*</span></h6>
+                            <select class="form-control" name="faculty" id="faculty">
+                                <option value="NULL" selected="">-- Please Select --</option>
+                                {% for i in facultyList %}
+                                <OPTION value={{i[0]}}>{{i[1]}}</OPTION>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col">
+                            <h6>Pursuing Degree<span style='color:red;'>*</span></h6>
+                            <select class="form-control" name="pursuingDegree" id="degree" disabled=true>
+                                <option value="NULL" selected="">-- Please Select Cluster First --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row" style="padding-top: 20px;">
+                        <div class="col">
+                            <h6>Password<span style='color:red;'>*</span></h6>
+                            <input type="password" class="form-control" placeholder="8 - 16 characters long"
+                                name="password">
+                        </div>
+                        <div class="col">
+                            <h6>Confirm Password<span style='color:red;'>*</span></h6>
+                            <input type="password" class="form-control" placeholder="Password">
+                        </div>
+                    </div>
+                    <!-- <div class="row" style="padding-top: 20px;">
                     <div class="col">
                         <h6>Making sure you are human<span style='color:red;'>*</span></h6>
                         <div class="g-recaptcha" data-sitekey="6LcV-w8bAAAAAOAGwTJUhplhzp4XkwJKvnIV6Ipt"></div>
                     </div>
                 </div> -->
-                <div class="row" style="padding-top: 20px;">
-                    <div class="col">
-                        <button type="submit" class="btn btn-primary mb-3">Sign Up</button>
+                    <div class="row" style="padding-top: 20px;">
+                        <div class="col">
+                            <button type="submit" class="btn btn-primary mb-3">Sign Up</button>
+                        </div>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
-    </div>
-</main>
+    </main>
+    <script>
+        faculty_select = document.getElementById('faculty');
+        degree_select = document.getElementById('degree');
+        faculty_select.onchange = function () {
+            let optionHTML = '';
+            if (faculty_select.value == "NULL") {
+                optionHTML += '<option value="NULL">-- Please Select Cluster First --</option>'
+                degree_select.disabled =true;
+                degree_select.innerHTML = optionHTML;
+            } else {
+                fetch("/register/faculty/" + faculty_select.value).then(function (response) {
+                    response.json().then(function (data) {
+                        for (degree of data.degreeList) {
+                            optionHTML += '<option value="' + degree.id + '">' + degree.name + '</option>'
+                        }
+                        degree_select.disabled =false;
+                        degree_select.innerHTML = optionHTML;
+                    });
+                });
+            }
+        }
+    </script>
 
-
-<!-- Optional JavaScript -->
-<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
         crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
         integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
         crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
 </body>
