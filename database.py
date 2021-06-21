@@ -54,6 +54,12 @@ class SingletonDatabase:
         myresult = cur.fetchall()
         return myresult
 
+    def executeSelectMultipleQueryWithParameters(self, query, values):
+        cur = self.mysql.connection.cursor()
+        cur.execute(query, values)
+        myresult = cur.fetchall()
+        return myresult
+
     def executeSelectOneQuery(self, query):
         cur = self.mysql.connection.cursor()
         cur.execute(query)
