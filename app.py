@@ -1,5 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
-from flask import jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from database import SingletonDatabase
 from UserSingleton import UserSingleton
 from scripts import tutee_calendar
@@ -103,6 +102,55 @@ def DegreeByFaculty(Faculty):
         degreeOjb['name'] = row[2]
         degreeArray.append(degreeOjb)
     return jsonify({'degreeList': degreeArray})
+
+@app.route('/profile', methods=['GET','POST'])
+def UpdateProfile():
+    user = UserInstance.getUser().getDetailsList()
+    facultyList = DatabaseInstance.executeSelectMultipleQuery('SELECT * FROM faculty ORDER BY FacultyID ASC')
+    degreeList = DatabaseInstance.executeSelectMultipleQueryWithParameters('SELECT * FROM degree WHERE FacultyID = (%s) ORDER BY DegreeID ASC',[user[8]])
+    print("hello")
+    print(user[11])
+    if request.method == "POST":
+        BinaryPicture = ""
+        uploaded_file = request.files['image_file']
+        print(uploaded_file)
+        if uploaded_file.filename != '':
+            BinaryPicture = uploaded_file.read()
+
+        formEmail = request.form.get('email')
+        formPassword = request.form.get('password')
+        formUserType = user[3]
+        formFirstName = request.form.get('firstName')
+        formLastName = request.form.get('lastName')
+        formAlist = request.form.get('alias')
+        formMoblieNumber = request.form.get('mobileNumber')
+        formFaculty = request.form.get('faculty')
+        formDegree = request.form.get('pursuingDegree')
+        formGradYear = request.form.get('gradyear')
+        DatabaseInstance.executeInsertQuery('UPDATE user SET Email = %s, Password = %s, UserType = %s, FirstName = %s, LastName = %s, Alias = %s, MobileNumber = %s, Faculty = %s, Degree = %s, GraduationYear = %s, ProfilePicture = %s WHERE UserID = %s',
+        [formEmail, formPassword, formUserType, formFirstName, formLastName, formAlist, formMoblieNumber, formFaculty, formDegree, formGradYear, BinaryPicture, user[0]])
+        userDetailList = DatabaseInstance.getDetailListOfUser(formEmail)
+        user = UserFactory.createUser(userDetailList)
+        UserInstance.setUser(user)
+        return redirect('/profile')
+    return render_template('profile.html', facultyList=facultyList, degreeList=degreeList, user=user)
+
+def UploadProfilePic():
+    user = UserInstance.getUser().getDetailsList()
+    PhotoPath = request.form.get('photo')
+    BinaryPicture = convertToBinaryData(PhotoPath)
+    DatabaseInstance.executeInsertQuery('UPDATE user SET ProfilePicture = %s WHERE UserID = %s ', [BinaryPicture, user[0]])
+
+def render_picture(data):
+    render_pic = ""
+    #render_pic = base64.b64encode(data).decode('ascii') 
+    return render_pic
+
+def convertToBinaryData(filename):
+    # Convert digital data to binary format
+    with open(filename, 'rb') as file:
+        binaryData = file.read()
+    return binaryData
 
 if __name__ == '__main__':
     app.run(debug=True)
