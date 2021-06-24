@@ -5,9 +5,11 @@ from UserSingleton import UserSingleton
 from scripts import tutee_calendar
 from pyzoom import ZoomClient
 from UserFactory import *
+from datetime import datetime as dt
 
 app = Flask(__name__)
-client = ZoomClient('0Q8s81KuT_2jFfxq3HYPNQ', 'IGZG9x2f4T4Z7JWfnkELg3sbRDg8YctQ5Ajp')
+client = ZoomClient('TSE_4EYwTrW6_uQYObr4Pg', 'i31hVKhUPjLO6JSp8tFB8DirYI7kauYKOZJF')
+
 
 # Update the settings of our database below
 
@@ -22,6 +24,16 @@ DatabaseInstance = database.get_instance()
 UserInstance = UserSingleton().get_instance()
 UserFactory = UserFactory()
 
+
+@app.route('/test')
+def test():
+    # Creating a meeting
+    # meeting = client.meetings.create_meeting('Puggies Meeting', start_time=dt.now().isoformat(), duration_min=60,
+    #                                          password='not-secure')
+
+    #client.meetings.delete_meeting(89989767233)
+    # print(meeting.id)
+    return render_template("test.html")
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -42,6 +54,9 @@ def login():
                 return redirect('/home')
     return render_template('login.html')
 
+@app.route('/meeting')
+def meeting():
+    return render_template("meeting.html")
 
 @app.route('/home')
 def home():
@@ -49,9 +64,9 @@ def home():
 
     switch = {
         1: render_template('admin_test.html'),
-        2: render_template('tutee_home.html', calendar_requests=tutee_calendar.calendar_requests,
+        3: render_template('tutee_home.html', calendar_requests=tutee_calendar.calendar_requests,
                            calendar_upcomings=tutee_calendar.calendar_upcomings),
-        3: render_template('tutor_test.html')
+        2: render_template('tutor_test.html')
     }
     return switch.get(userRole, render_template('error_page.html'))
 
@@ -90,4 +105,4 @@ def DegreeByFaculty(Faculty):
     return jsonify({'degreeList': degreeArray})
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
