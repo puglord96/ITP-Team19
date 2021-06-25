@@ -24,17 +24,17 @@ UserInstance = UserSingleton().get_instance()
 UserFactory = UserFactory()
 
 
-@app.route('/test')
+@app.route('/')
 def test():
     # Creating a meeting
-    # meeting = client.meetings.create_meeting('Puggies Meeting', start_time=dt.now().isoformat(), duration_min=60,
-    #                                          password='not-secure')
+    #meeting = client.meetings.create_meeting('Test Meeting', start_time=dt.now().isoformat(), duration_min=60,
+     #                                         password='')
 
-    #client.meetings.delete_meeting(89989767233)
-    # print(meeting.id)
+    #client.meetings.delete_meeting(81168760280)
+    #print(meeting.id)
     return render_template("test.html")
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/test', methods=['GET', 'POST'])
 def login():
     userlist = DatabaseInstance.executeSelectMultipleQuery("Select email,password from user")
     if request.method == "POST":
@@ -143,7 +143,7 @@ def UploadProfilePic():
 
 def render_picture(data):
     render_pic = ""
-    #render_pic = base64.b64encode(data).decode('ascii') 
+    #render_pic = base64.b64encode(data).decode('ascii')
     return render_pic
 
 def convertToBinaryData(filename):
