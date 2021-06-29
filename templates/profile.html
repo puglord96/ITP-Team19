@@ -29,7 +29,6 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
-
     <script src="../static/code/data.js"></script>
     <script src="../static/code/exporting.js"></script>
     <script src="../static/code/export-data.js"></script>
@@ -38,8 +37,6 @@
     <script src="../static/code/graph.js"></script>
     <script src="../static/code/exporting.js"></script>
     <script src="../static/code/datatables.js"></script>
-
-
     {% if title %}
     <title>Communication Helpdesk - {{ title }}</title>
     {% else %}
@@ -68,7 +65,7 @@
                             <h3>Profile</h3>
                         </div>
                         <div class="col">
-                            <img src="{{ user[11] }}" width="50cm" height="50cm">
+                            <img src="data:;base64,{{ profilePic }}" width="50cm" height="50cm">
                             <br>
                             <input type="file" name="image_file" accept="image/*">
                         </div>
@@ -151,6 +148,36 @@
                             <input type="password" class="form-control" placeholder="Password">
                         </div>
                     </div>
+                    {% if expertisesList %}
+                    <div class="row" style="padding-top: 20px;">
+                        <div class="col">
+                            <h6>Expertises</h6>
+                            {% for i in expertisesList %}
+                            <label>{{i}}</label>
+                            {% if userExpertisesList[loop.index0] == 1 %}
+                            <input type="checkbox" name="expertises" value="{{loop.index0}}" checked/>
+                            {% else %}
+                            <input type="checkbox" name="expertises" value="{{loop.index0}}" />
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if timeSlotList %}
+                    <div class="row" style="padding-top: 20px;">
+                        <div class="col">
+                            <h6>Time Slot Preference</h6>
+                            {% for i in timeSlotList %}
+                            <label>{{i}}</label>
+                            {% if userTimeSlotList[loop.index0] == 1 %}
+                            <input type="checkbox" name="timeSlot" value="{{loop.index0}}" checked/>
+                            {% else %}
+                            <input type="checkbox" name="timeSlot" value="{{loop.index0}}" />
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
                     <div class="row" style="padding-top: 20px;">
                         <div class="col">
                             <button type="submit" class="btn btn-primary mb-3">Update</button>
