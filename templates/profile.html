@@ -37,6 +37,11 @@
     <script src="../static/code/graph.js"></script>
     <script src="../static/code/exporting.js"></script>
     <script src="../static/code/datatables.js"></script>
+    <style>
+        img {
+            border-radius: 50%;
+        }
+    </style>
     {% if title %}
     <title>Communication Helpdesk - {{ title }}</title>
     {% else %}
@@ -62,10 +67,16 @@
                 <form method="POST" enctype="multipart/form-data">
                     <div class="row">
                         <div class="col">
-                            <h3>Profile</h3>
+                            <h3>
+                                Profile
+                            </h3>
                         </div>
                         <div class="col">
-                            <img src="data:;base64,{{ profilePic }}" width="50cm" height="50cm">
+                            {% if profilePic %}
+                            <img src="data:;base64,{{ profilePic }}" width="100cm" height="100cm">
+                            {% else %}
+                            <img src="static\IMG\DefaultProfilePic.png" width="100cm" height="100cm">
+                            {% endif %}
                             <br>
                             <input type="file" name="image_file" accept="image/*">
                         </div>
@@ -155,7 +166,7 @@
                             {% for i in expertisesList %}
                             <label>{{i}}</label>
                             {% if userExpertisesList[loop.index0] == 1 %}
-                            <input type="checkbox" name="expertises" value="{{loop.index0}}" checked/>
+                            <input type="checkbox" name="expertises" value="{{loop.index0}}" checked />
                             {% else %}
                             <input type="checkbox" name="expertises" value="{{loop.index0}}" />
                             {% endif %}
@@ -170,7 +181,7 @@
                             {% for i in timeSlotList %}
                             <label>{{i}}</label>
                             {% if userTimeSlotList[loop.index0] == 1 %}
-                            <input type="checkbox" name="timeSlot" value="{{loop.index0}}" checked/>
+                            <input type="checkbox" name="timeSlot" value="{{loop.index0}}" checked />
                             {% else %}
                             <input type="checkbox" name="timeSlot" value="{{loop.index0}}" />
                             {% endif %}
