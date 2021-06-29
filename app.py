@@ -5,6 +5,7 @@ from scripts import tutee_calendar
 from pyzoom import ZoomClient
 from UserFactory import *
 from datetime import datetime as dt
+from base64 import b64encode
 
 app = Flask(__name__)
 client = ZoomClient('TSE_4EYwTrW6_uQYObr4Pg', 'i31hVKhUPjLO6JSp8tFB8DirYI7kauYKOZJF')
@@ -24,7 +25,7 @@ UserInstance = UserSingleton().get_instance()
 UserFactory = UserFactory()
 
 
-@app.route('/')
+@app.route('/test')
 def test():
     # Creating a meeting
     #meeting = client.meetings.create_meeting('Test Meeting', start_time=dt.now().isoformat(), duration_min=60,
@@ -34,7 +35,7 @@ def test():
     #print(meeting.id)
     return render_template("test.html")
 
-@app.route('/test', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def login():
     userlist = DatabaseInstance.executeSelectMultipleQuery("Select email,password from user")
     if request.method == "POST":
@@ -43,12 +44,8 @@ def login():
         for user in userlist:
             if formEmail == user[0] and formPassword == user[1]:
                 userDetailList = DatabaseInstance.getDetailListOfUser(formEmail)
-
                 user = UserFactory.createUser(userDetailList)
-
                 UserInstance.setUser(user)
-
-                print(user.getUserRole())
 
                 return redirect('/home')
     return render_template('login.html')
@@ -80,13 +77,13 @@ def register():
     if request.method == "POST":
         formEmail = request.form.get('email')
         formPassword = request.form.get('password')
-        formUserType = 2
+        formUserType = 3
         formFirstName = request.form.get('firstName')
         formLastName = request.form.get('lastName')
         formFaculty = request.form.get('faculty')
         formDegree = request.form.get('pursuingDegree')
         formGradYear = request.form.get('gradyear')
-        DatabaseInstance.executeInsertQuery("INSERT INTO user(email, password, usertype, firstname, lastname, faculty, degree, graduationyear) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", [formEmail, formPassword, formUserType, formFirstName, formLastName, formFaculty, formDegree, formGradYear])
+        DatabaseInstance.executeInsertQueryWithParameters("INSERT INTO user(email, password, usertype, firstname, lastname, faculty, degree, graduationyear) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", [formEmail, formPassword, formUserType, formFirstName, formLastName, formFaculty, formDegree, formGradYear])
         return redirect('/')
 
     facultyList = DatabaseInstance.executeSelectMultipleQuery('SELECT * FROM faculty ORDER BY FacultyID ASC')
@@ -106,17 +103,11 @@ def DegreeByFaculty(Faculty):
 @app.route('/profile', methods=['GET','POST'])
 def UpdateProfile():
     user = UserInstance.getUser().getDetailsList()
-    facultyList = DatabaseInstance.executeSelectMultipleQuery('SELECT * FROM faculty ORDER BY FacultyID ASC')
-    degreeList = DatabaseInstance.executeSelectMultipleQueryWithParameters('SELECT * FROM degree WHERE FacultyID = (%s) ORDER BY DegreeID ASC',[user[8]])
-    print("hello")
-    print(user[11])
     if request.method == "POST":
         BinaryPicture = ""
         uploaded_file = request.files['image_file']
-        print(uploaded_file)
         if uploaded_file.filename != '':
             BinaryPicture = uploaded_file.read()
-
         formEmail = request.form.get('email')
         formPassword = request.form.get('password')
         formUserType = user[3]
@@ -127,30 +118,64 @@ def UpdateProfile():
         formFaculty = request.form.get('faculty')
         formDegree = request.form.get('pursuingDegree')
         formGradYear = request.form.get('gradyear')
-        DatabaseInstance.executeInsertQuery('UPDATE user SET Email = %s, Password = %s, UserType = %s, FirstName = %s, LastName = %s, Alias = %s, MobileNumber = %s, Faculty = %s, Degree = %s, GraduationYear = %s, ProfilePicture = %s WHERE UserID = %s',
-        [formEmail, formPassword, formUserType, formFirstName, formLastName, formAlist, formMoblieNumber, formFaculty, formDegree, formGradYear, BinaryPicture, user[0]])
-        userDetailList = DatabaseInstance.getDetailListOfUser(formEmail)
+        if formPassword:
+            if BinaryPicture:
+                DatabaseInstance.executeUpdateQueryWithParameters('UPDATE user SET Email = %s, Password = %s, UserType = %s, FirstName = %s, LastName = %s, Alias = %s, MobileNumber = %s, Faculty = %s, Degree = %s, GraduationYear = %s, ProfilePicture = %s WHERE UserID = %s',
+                [formEmail, formPassword, formUserType, formFirstName, formLastName, formAlist, formMoblieNumber, formFaculty, formDegree, formGradYear, BinaryPicture, user[0]])
+            else:
+                DatabaseInstance.executeUpdateQueryWithParameters('UPDATE user SET Email = %s, Password = %s, UserType = %s, FirstName = %s, LastName = %s, Alias = %s, MobileNumber = %s, Faculty = %s, Degree = %s, GraduationYear = %sWHERE UserID = %s',
+                [formEmail, formPassword, formUserType, formFirstName, formLastName, formAlist, formMoblieNumber, formFaculty, formDegree, formGradYear, user[0]])
+        else:
+            if BinaryPicture:
+                DatabaseInstance.executeUpdateQueryWithParameters('UPDATE user SET Email = %s, UserType = %s, FirstName = %s, LastName = %s, Alias = %s, MobileNumber = %s, Faculty = %s, Degree = %s, GraduationYear = %s, ProfilePicture = %s WHERE UserID = %s',
+                [formEmail, formUserType, formFirstName, formLastName, formAlist, formMoblieNumber, formFaculty, formDegree, formGradYear, BinaryPicture, user[0]])
+            else:
+                DatabaseInstance.executeUpdateQueryWithParameters('UPDATE user SET Email = %s, UserType = %s, FirstName = %s, LastName = %s, Alias = %s, MobileNumber = %s, Faculty = %s, Degree = %s, GraduationYear = %s WHERE UserID = %s',
+                [formEmail, formUserType, formFirstName, formLastName, formAlist, formMoblieNumber, formFaculty, formDegree, formGradYear, user[0]])
+
+        formExpertises = request.form.getlist("expertises")
+        formTimeSlot = request.form.getlist("timeSlot")
+        if formExpertises:
+            DBexpertisesList = ['EssayWriting', 'ReportWriting', 'OralPresentation', 'GrammarCheck', 'SpellingCheck']
+            if DatabaseInstance.executeSelectOneQuery('SELECT * FROM userexpertises WHERE UserID = {}'.format(user[0])):
+                for i in DBexpertisesList:
+                    DatabaseInstance.executeUpdateQuery('UPDATE userexpertises SET {} = 0 WHERE UserID = {}'.format(i, user[0]))
+                for i in formExpertises:
+                    DatabaseInstance.executeUpdateQuery('UPDATE userexpertises SET {} = 1 WHERE UserID = {}'.format(DBexpertisesList[int(i)], user[0]))
+            else:
+                DatabaseInstance.executeInsertQueryWithParameters('INSERT INTO userexpertises (UserID) VALUES (%s)', [user[0]])
+                for i in formExpertises:
+                    DatabaseInstance.executeUpdateQuery('UPDATE userexpertises SET {} = 1 WHERE UserID = {}'.format(DBexpertisesList[int(i)], user[0]))
+        if formTimeSlot:
+            DBtimeSlotList = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+            if DatabaseInstance.executeSelectOneQuery('SELECT * FROM usertimeslotpreference WHERE UserID = {}'.format(user[0])):
+                for i in DBtimeSlotList:
+                    DatabaseInstance.executeUpdateQuery('UPDATE usertimeslotpreference SET {} = 0 WHERE UserID = {}'.format(i, user[0]))
+                for i in formTimeSlot:
+                    DatabaseInstance.executeUpdateQuery('UPDATE usertimeslotpreference SET {} = 1 WHERE UserID = {}'.format(DBtimeSlotList[int(i)], user[0]))
+            else:
+                DatabaseInstance.executeInsertQueryWithParameters('INSERT INTO usertimeslotpreference (UserID) VALUES (%s)', [user[0]])
+                for i in formTimeSlot:
+                    DatabaseInstance.executeUpdateQuery('UPDATE usertimeslotpreference SET {} = 1 WHERE UserID = {}'.format(DBtimeSlotList[int(i)], user[0]))
+
+        userDetailList = DatabaseInstance.getUserDetails(str(user[0]))
         user = UserFactory.createUser(userDetailList)
         UserInstance.setUser(user)
         return redirect('/profile')
-    return render_template('profile.html', facultyList=facultyList, degreeList=degreeList, user=user)
 
-def UploadProfilePic():
-    user = UserInstance.getUser().getDetailsList()
-    PhotoPath = request.form.get('photo')
-    BinaryPicture = convertToBinaryData(PhotoPath)
-    DatabaseInstance.executeInsertQuery('UPDATE user SET ProfilePicture = %s WHERE UserID = %s ', [BinaryPicture, user[0]])
-
-def render_picture(data):
-    render_pic = ""
-    #render_pic = base64.b64encode(data).decode('ascii')
-    return render_pic
-
-def convertToBinaryData(filename):
-    # Convert digital data to binary format
-    with open(filename, 'rb') as file:
-        binaryData = file.read()
-    return binaryData
+    expertisesList = ['Essay Writing', 'Report Writing', 'Oral Presentation', 'Gammar Check', 'Spelling Check']
+    timeSlotList = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    facultyList = DatabaseInstance.executeSelectMultipleQuery('SELECT * FROM faculty ORDER BY FacultyID ASC')
+    degreeList = DatabaseInstance.executeSelectMultipleQueryWithParameters('SELECT * FROM degree WHERE FacultyID = (%s) ORDER BY DegreeID ASC',[user[8]])
+    profilePic = ""
+    if user[11]:
+        profilePic = b64encode(user[11]).decode("utf-8")
+    if user[3] == 2:
+        userExpertisesList = DatabaseInstance.executeSelectOneQueryWithParameters('SELECT EssayWriting, ReportWriting, OralPresentation, GrammarCheck, SpellingCheck FROM userexpertises WHERE UserID = (%s)',[user[0]])
+        userTimeSlotList = DatabaseInstance.executeSelectOneQueryWithParameters('SELECT Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday FROM usertimeslotpreference WHERE UserID = (%s)',[user[0]])
+        
+        
+    return render_template('profile.html', facultyList=facultyList, degreeList=degreeList, user=user, profilePic=profilePic, expertisesList=expertisesList, timeSlotList=timeSlotList, userExpertisesList=userExpertisesList, userTimeSlotList=userTimeSlotList)
 
 if __name__ == '__main__':
     app.run(debug=True)
