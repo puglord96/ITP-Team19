@@ -42,6 +42,12 @@ class SingletonDatabase:
         myresult = cur.fetchone()
         return myresult
 
+    def getUserDetails(self, UserID):
+        cur = self.mysql.connection.cursor()
+        cur.execute("SELECT * FROM user WHERE userID = '" + UserID+"'")
+        myresult = cur.fetchone()
+        return myresult
+
     def executeNonSelectQuery(self, query):
         cur = self.mysql.connection.cursor()
         cur.execute(query)
@@ -66,7 +72,24 @@ class SingletonDatabase:
         myresult = cur.fetchone()
         return myresult
 
-    def executeInsertQuery(self, query, values):
+    def executeSelectOneQueryWithParameters(self, query, values):
+        cur = self.mysql.connection.cursor()
+        cur.execute(query, values)
+        myresult = cur.fetchone()
+        return myresult
+
+    def executeInsertQuery(self, query):
+        try:
+            cur = self.mysql.connection.cursor()
+            cur.execute(query)
+            self.mysql.connection.commit()
+            cur.close()
+            return True
+        except Exception as e:
+            print("Problem inserting into database: " + str(e))
+            return False
+
+    def executeInsertQueryWithParameters(self, query, values):
         try:
             cur = self.mysql.connection.cursor()
             cur.execute(query, values)
@@ -75,4 +98,26 @@ class SingletonDatabase:
             return True
         except Exception as e:
             print("Problem inserting into database: " + str(e))
+            return False
+
+    def executeUpdateQuery(self, query):
+        try:
+            cur = self.mysql.connection.cursor()
+            cur.execute(query)
+            self.mysql.connection.commit()
+            cur.close()
+            return True
+        except Exception as e:
+            print("Problem Update into database: " + str(e))
+            return False
+
+    def executeUpdateQueryWithParameters(self, query, values):
+        try:
+            cur = self.mysql.connection.cursor()
+            cur.execute(query, values)
+            self.mysql.connection.commit()
+            cur.close()
+            return True
+        except Exception as e:
+            print("Problem Update into database: " + str(e))
             return False
