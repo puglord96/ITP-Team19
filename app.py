@@ -50,6 +50,16 @@ def login():
                 return redirect('/home')
     return render_template('login.html')
 
+@app.route('/zoom_test')
+def zoom_test():
+    # Creating a meeting
+    meeting = client.meetings.create_meeting('Test Meeting', start_time=dt.now().isoformat(), duration_min=60,
+                                             password='password')
+
+    # client.meetings.delete_meeting(81168760280)
+    print(meeting.id)
+    return render_template("zoom_meeting_test.html")
+
 @app.route('/meeting')
 def meeting():
     return render_template("meeting.html")
