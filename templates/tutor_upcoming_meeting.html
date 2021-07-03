@@ -1,0 +1,58 @@
+{% extends "tutor_layout.html" %}
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <h3>Upcoming Meetings</h3>
+            <div class="jumbotron jumbotron-fluid" style="padding:20px;">
+                <div class='container-fluid' id="calendar" style="width: 50%">
+
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+                        let calendarEl = document.getElementById('calendar');
+                      let calendar = new FullCalendar.Calendar(calendarEl, {
+                      initialView: 'listWeek',
+                      events: [
+                        {
+                          title: 'Meeting (completed)',
+                          start: '2021-06-06T14:30:00',
+                          extendedProps: {
+                            status: 'done'
+                          }
+                        },
+                        {
+                          title: 'Meeting',
+                          start: '2021-06-07T07:00:00',
+                          backgroundColor: 'green',
+                          borderColor: 'green'
+                        }
+                      ],
+                      eventDidMount: function(info) {
+                        if (info.event.extendedProps.status === 'done') {
+
+                          // Change background color of row
+                          info.el.style.backgroundColor = '#F0FFFF';
+
+                          // Change color of dot marker
+                          var dotEl = info.el.getElementsByClassName('fc-event-dot')[0];
+                          if (dotEl) {
+                            dotEl.style.backgroundColor = 'white';
+                          }
+                        }
+                      }
+
+                    });
+
+                    calendar.render();
+
+
+        </script>
+    </div>
+</div>
+</div>
+{% endblock content %}

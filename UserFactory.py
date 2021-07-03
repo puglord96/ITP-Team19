@@ -16,7 +16,7 @@ class User:
 class TuteeUser(User):
     def __init__(self, UserDetails):
         super().__init__(UserDetails)
-        self.landing_page = "tutee_home.html"
+        self.landing_page = "tutor_home.html"
 
     pass
 
