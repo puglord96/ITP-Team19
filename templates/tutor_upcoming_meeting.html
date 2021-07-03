@@ -16,22 +16,23 @@
         <script>
                         let calendarEl = document.getElementById('calendar');
                       let calendar = new FullCalendar.Calendar(calendarEl, {
-                      initialView: 'listWeek',
+                      initialView: 'listMonth',
                       events: [
+                       {% for calendar_upcoming in calendar_upcomings %}
                         {
-                          title: 'Meeting (completed)',
-                          start: '2021-06-06T14:30:00',
-                          extendedProps: {
-                            status: 'done'
-                          }
+                        title : '{{ calendar_upcoming.todo }}',
+                        start : '{{ calendar_upcoming.date }}',
+                         url: '{{ calendar_upcoming.zoom_link }}'
                         },
-                        {
-                          title: 'Meeting',
-                          start: '2021-06-07T07:00:00',
-                          backgroundColor: 'green',
-                          borderColor: 'green'
-                        }
+                        {% endfor %}
                       ],
+eventClick: function(info){
+                        <!-- prevent default prevents redirecting to the URL-->
+                            info.jsEvent.preventDefault();
+                            alert('Event: ' + info.event.title);
+                            alert('Start: ' + info.event.start);
+                            alert('Zoom Link: ' + info.event.url);
+                    },
                       eventDidMount: function(info) {
                         if (info.event.extendedProps.status === 'done') {
 

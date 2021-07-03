@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from database import SingletonDatabase
 from UserSingleton import UserSingleton
-from scripts import tutee_calendar
+from scripts import tutor_calendar
 from pyzoom import ZoomClient
 from UserFactory import *
 from datetime import datetime as dt
@@ -70,8 +70,8 @@ def home():
 
     switch = {
         1: render_template('admin_test.html'),
-        2: render_template('tutor_home.html', calendar_requests=tutee_calendar.calendar_requests,
-                           calendar_upcomings=tutee_calendar.calendar_upcomings),
+        2: render_template('tutor_home.html', calendar_requests=tutor_calendar.calendar_requests,
+                           calendar_upcomings=tutor_calendar.calendar_upcomings),
         3: render_template('tutee_test.html')
     }
     return switch.get(userRole, render_template('error_page.html'))
@@ -82,7 +82,7 @@ def home():
 def tutee_upcoming_meeting():
     userRole = UserInstance.getUser().getUserRole()
     if userRole == 2:
-        return render_template("tutor_upcoming_meeting.html", calendar_requests=tutee_calendar.calendar_requests)
+        return render_template("tutor_upcoming_meeting.html", calendar_upcomings=tutor_calendar.calendar_upcomings)
     return render_template ("error_page.html")
 
 
