@@ -2,15 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="548e18fe-eee7-4b69-83f9-76b6966b4a12" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/templates/feedback.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/session_booking.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/main.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/meeting.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/meeting.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/tutor_home.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/tutor_home.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/tutor_layout.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/tutor_layout.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -134,6 +126,7 @@
       <workItem from="1625121433946" duration="7843000" />
       <workItem from="1625235978150" duration="2581000" />
       <workItem from="1625298854805" duration="5098000" />
+      <workItem from="1625305579928" duration="36000" />
     </task>
     <servers />
   </component>
@@ -162,25 +155,29 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="516" y="268" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.0.1536.824@0.0.1536.824" timestamp="1625305107773" />
-    <state width="745" height="208" key="GridCell.Tab.0.bottom" timestamp="1625305119679">
+    <state width="745" height="208" key="GridCell.Tab.0.bottom" timestamp="1625305783206">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="745" height="208" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1625305119679" />
-    <state width="745" height="208" key="GridCell.Tab.0.center" timestamp="1625305119679">
+    <state width="745" height="208" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1625305783206" />
+    <state width="745" height="208" key="GridCell.Tab.0.center" timestamp="1625305783206">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="745" height="208" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1625305119679" />
-    <state width="745" height="208" key="GridCell.Tab.0.left" timestamp="1625305119679">
+    <state width="745" height="208" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1625305783206" />
+    <state width="745" height="208" key="GridCell.Tab.0.left" timestamp="1625305783205">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="745" height="208" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1625305119679" />
-    <state width="745" height="208" key="GridCell.Tab.0.right" timestamp="1625305119679">
+    <state width="745" height="208" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1625305783205" />
+    <state width="745" height="208" key="GridCell.Tab.0.right" timestamp="1625305783206">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="745" height="208" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1625305119679" />
+    <state width="745" height="208" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1625305783206" />
+    <state x="277" y="54" key="SettingsEditor" timestamp="1625305615149">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="277" y="54" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1625305615149" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/ITP_Team19$app.coverage" NAME="app Coverage Results" MODIFIED="1625304853593" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/ITP_Team19$app.coverage" NAME="app Coverage Results" MODIFIED="1625305783192" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/ITP_Team19$ITP_Team19.coverage" NAME="ITP-Team19 Coverage Results" MODIFIED="1625299840456" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

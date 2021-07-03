@@ -87,9 +87,9 @@ def home():
 
     switch = {
         1: render_template('admin_test.html'),
-        2: render_template('tutor_home.html', calendar_requests=tutor_calendar.calendar_requests,
+        3: render_template('tutee_home.html', calendar_requests=tutor_calendar.calendar_requests,
                            calendar_upcomings=tutor_calendar.calendar_upcomings),
-        3: render_template('tutee_test.html')
+        2: render_template('tutor_test.html')
     }
     return switch.get(userRole, render_template('error_page.html'))
 
