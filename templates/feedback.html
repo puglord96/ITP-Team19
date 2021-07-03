@@ -1,0 +1,37 @@
+{% extends "tutee_layout.html" %}
+{% block content %}
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8">
+                <form method="POST">
+                    <div class="form-group">
+                        <label for="tutortuteename">Tutor/Tutee Name</label>
+                        <input class="form-control" type="text" name="tutortuteename" id="tutortuteename" value="{{ tutortuteename }}" aria-label="readonly input example" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="sessionrating">How did you find today's session?</label>
+                        <br>
+                        <small>Very Unsatisfactory</small>
+                        <input type="range" class="form-range" id="sessionrating" name="sessionrating" min="0" max="10" step="1">
+                        <small>Very Satisfactory</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="tutortuteerating">How did you find today's tutor?</label>
+                        <br>
+                        <small>Very Unsatisfactory</small>
+                        <input type="range" class="form-range" id="tutortuteerating" name="tutortuteerating" min="0" max="10" step="1">
+                        <small>Very Satisfactory</small>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="remarks">Any additional remarks you want to give for the session?</label>
+                        <textarea class="form-control" id="remarks" name="remarks"></textarea>
+
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

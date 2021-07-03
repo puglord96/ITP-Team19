@@ -28,7 +28,7 @@ function websdkready() {
       );
     })(),
     passWord: tmpArgs.pwd,
-    leaveUrl: "/register",
+    leaveUrl: "/feedback",
     role: parseInt(tmpArgs.role, 10),
     userEmail: (function () {
       try {

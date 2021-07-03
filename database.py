@@ -44,7 +44,7 @@ class SingletonDatabase:
 
     def getUserDetails(self, UserID):
         cur = self.mysql.connection.cursor()
-        cur.execute("SELECT * FROM user WHERE userID = '" + UserID+"'")
+        cur.execute("SELECT * FROM user WHERE userID = " + str(UserID))
         myresult = cur.fetchone()
         return myresult
 

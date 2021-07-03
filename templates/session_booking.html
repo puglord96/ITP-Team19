@@ -1,0 +1,97 @@
+{% extends "tutee_layout.html" %}
+{% block content %}
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header bg-bluetheme">
+                        Booking a Session
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            <div class="row">
+                                <div class="col">
+                                <label for="expertise">Expertise</label>
+                                <select class="form-control form-control-small" name="expertise" id="expertise" style="margin-bottom: 10px;">
+                                    <option selected></option>
+                                    <option value="Essay">Essay</option>
+                                    <option value="Technical Proposal">Technical Proposal</option>
+                                    <option value="Oral Presentation">Oral Presentation</option>
+                                    <option value="Reader Response">Reader Response</option>
+                                    <option value="Reflection">Reflection</option>
+                                </select>
+
+                                <label for="gender">Gender</label>
+                                <select class="form-control form-control-small" name="gender" id="gender">
+                                    <option selected></option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                                </div>
+                                <div class="col">
+                                <label for="discipline">Discipline</label>
+                                <select class="form-control form-control-small" name="discipline" id="discipline" style="margin-bottom: 10px;">
+                                    <option selected></option>
+                                    {% for discipline in disciplinelist %}
+                                    <option value="{{ discipline[0] }}">{{ discipline[0] }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="rating">Rating</label>
+                                <select class="form-control form-control-small" name="rating" id="rating">
+                                    <option selected></option>
+                                    {% for rating in range(6) %}
+                                    <option value="{{ rating }}">{{ rating }}</option>
+                                    {% endfor %}
+                                </select>
+                                </div>
+                            </div>
+
+                        <button type="submit" class="btn bg-bluetheme" style="margin-top: 10px;">Search</button>
+                        </form>
+                    </div>
+                </div>
+
+            <div class="card">
+                    <div class="card-header bg-bluetheme">
+                        Available Sessions
+                    </div>
+                    <div class="card-body">
+
+
+                    <a href="#">View all available sessions</a>
+                    <div class='container-fluid' id="sessioncalendar"></div>
+                </div>
+
+
+
+                </div>
+
+            <script>
+                    let calendarEl = document.getElementById('sessioncalendar');
+                    let calendar = new FullCalendar.Calendar(calendarEl, {
+                    events: [
+                        {% for calendar_upcoming in calendar_upcomings %}
+                        {
+                        title : '{{ calendar_upcoming.todo }}',
+                        start : '{{ calendar_upcoming.date }}',
+                        url: '{{ calendar_upcoming.zoom_link }}'
+                        },
+                        {% endfor %}
+                    ],
+                        eventClick: function(info){
+                        <!-- prevent default prevents redirecting to the URL-->
+                            info.jsEvent.preventDefault();
+                            alert('Event: ' + info.event.title);
+                            alert('Start: ' + info.event.start);
+                            alert('Zoom Link: ' + info.event.url);
+                    }
+                    });
+                    calendar.render();
+                    </script>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock content %}

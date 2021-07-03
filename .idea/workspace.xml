@@ -2,14 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="548e18fe-eee7-4b69-83f9-76b6966b4a12" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/templates/tutor_upcoming_meeting.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/ITP-Team19.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/ITP-Team19.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/feedback.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/session_booking.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserFactory.py" beforeDir="false" afterPath="$PROJECT_DIR$/UserFactory.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/tutee_home.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/tutor_home.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/tutee_layout.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/tutor_layout.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/main.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/meeting.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/meeting.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/tutor_home.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/tutor_home.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/tutor_layout.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/tutor_layout.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,6 +29,9 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1tOepWq9cqL46v8fFtSNPepCrZC" />
+  <component name="ProjectReloadState">
+    <option name="STATE" value="1" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -46,6 +50,7 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="npm" />
+    <property name="run.code.analysis.last.selected.profile" value="aDefault" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
@@ -88,7 +93,7 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="C:\Users\z\PycharmProjects\CommunicationHelpdesk\venv\Scripts\python.exe" />
+      <option name="SDK_HOME" value="C:\Users\Wong Kin Seong\Documents\GitHub\ITP-Team19\venv\Scripts\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -108,7 +113,7 @@
       <item itemvalue="Python.ITP-Team19" />
     </list>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SpellCheckerSettings" BundledDictionaries="0" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="application-level" UseSingleDictionary="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -136,11 +141,42 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>
     </option>
-    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="223" y="67" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1625304851462">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="223" y="67" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1625304851462" />
+    <state x="516" y="268" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1625305107773">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="516" y="268" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.0.1536.824@0.0.1536.824" timestamp="1625305107773" />
+    <state width="745" height="208" key="GridCell.Tab.0.bottom" timestamp="1625305119679">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="745" height="208" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1625305119679" />
+    <state width="745" height="208" key="GridCell.Tab.0.center" timestamp="1625305119679">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="745" height="208" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1625305119679" />
+    <state width="745" height="208" key="GridCell.Tab.0.left" timestamp="1625305119679">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="745" height="208" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1625305119679" />
+    <state width="745" height="208" key="GridCell.Tab.0.right" timestamp="1625305119679">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="745" height="208" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1625305119679" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/ITP_Team19$app.coverage" NAME="app Coverage Results" MODIFIED="1625304853593" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/ITP_Team19$ITP_Team19.coverage" NAME="ITP-Team19 Coverage Results" MODIFIED="1625299840456" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>
