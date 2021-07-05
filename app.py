@@ -86,7 +86,7 @@ def home():
     userRole = UserInstance.getUser().getUserRole()
 
     switch = {
-        1: render_template('admin_test.html'),
+        1: render_template('admin_home.html'),
         3: render_template('tutee_home.html', calendar_requests=tutor_calendar.calendar_requests,
                            calendar_upcomings=tutor_calendar.calendar_upcomings),
         2: render_template('tutor_test.html')
@@ -231,18 +231,26 @@ def UpdateProfile():
     profilePic = ""
     if user[11]:
         profilePic = b64encode(user[11]).decode("utf-8")
-    if user[3] == 2:
-        userExpertisesList = DatabaseInstance.executeSelectOneQueryWithParameters(
-            'SELECT EssayWriting, ReportWriting, OralPresentation, GrammarCheck, SpellingCheck FROM userexpertises WHERE UserID = (%s)',
-            [user[0]])
-        userTimeSlotList = DatabaseInstance.executeSelectOneQueryWithParameters(
-            'SELECT Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday FROM usertimeslotpreference WHERE UserID = (%s)',
-            [user[0]])
+    
+    userExpertisesList = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT EssayWriting, ReportWriting, OralPresentation, GrammarCheck, SpellingCheck FROM userexpertises WHERE UserID = (%s)',
+        [user[0]])
+    userTimeSlotList = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday FROM usertimeslotpreference WHERE UserID = (%s)',
+        [user[0]])
 
     return render_template('profile.html', facultyList=facultyList, degreeList=degreeList, user=user,
                            profilePic=profilePic, expertisesList=expertisesList, timeSlotList=timeSlotList,
                            userExpertisesList=userExpertisesList, userTimeSlotList=userTimeSlotList)
 
+@app.route('/admin')
+def index(chartID = 'container', chart_type = 'line', chart_height = 350):
+	chart = {"renderTo": chartID, "type": chart_type, "height": chart_height,}
+	series = [{'name': 'data1', "data": [1,2,3]}, {"name": 'data2', "data": [4, 5, 6]}]
+	title = {"{text": 'Today}'}
+	xAxis = {"categories": ['xAxis Data1', 'xAxis Data2']}
+	yAxis = {"title": {"text": 'yAxis Label'}}
+	return render_template('admin_home.html', chartID=chartID, chart=chart, series=series, title=title, xAxis=xAxis, yAxis=yAxis)
 
 if __name__ == '__main__':
     app.run(debug=True)
