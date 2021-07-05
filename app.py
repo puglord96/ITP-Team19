@@ -43,7 +43,7 @@ def feedback():
     return render_template("feedback.html", tutortuteename=tutortuteename)
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     userlist = DatabaseInstance.executeSelectMultipleQuery("Select email,password from user")
     if request.method == "POST":
@@ -59,7 +59,7 @@ def login():
     return render_template('login.html')
 
 
-@app.route('/zoom_test')
+@app.route('/')
 def zoom_test():
     # Creating a meeting
     meeting = client.meetings.create_meeting('Test Meeting', start_time=dt.now().isoformat(), duration_min=60,
