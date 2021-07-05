@@ -43,7 +43,7 @@ def feedback():
     return render_template("feedback.html", tutortuteename=tutortuteename)
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def login():
     userlist = DatabaseInstance.executeSelectMultipleQuery("Select email,password from user")
     if request.method == "POST":
@@ -59,16 +59,6 @@ def login():
     return render_template('login.html')
 
 
-@app.route('/')
-def create_zoom_test():
-    tuteeid = DatabaseInstance.executeSelectOneQuery("select u.firstname from user u, meeting m where u.userID = m.tuteeid and m.meetingID = 2")
-    venue = DatabaseInstance.executeSelectOneQuery("select venue from meeting where meetingID = 2")[0]
-    print(venue)
-
-    resp = make_response(render_template("create_zoom.html",tuteeid = tuteeid, venue = venue))
-    resp.set_cookie('meeting_number',venue)
-    resp.set_cookie('name',"hello world")
-    return resp
 
 
 @app.route('/ztest')
@@ -95,15 +85,33 @@ def meeting():
 
 @app.route('/home')
 def home():
-    userRole = UserInstance.getUser().getUserRole()
 
-    switch = {
+
+    userRole = UserInstance.getUser().getUserRole()
+    userName = UserInstance.getUser().getUserName()
+    userLandingPage = UserInstance.getUser().landing_page
+
+
+
+
+    if userRole == 2:
+        meetingslist = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic from user u,meeting m where m.tutorID = u.UserID and m.tuteeID = %s", [userRole])
+    else:
+        meetingslist = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic from user u,meeting m where m.tuteeID = u.UserID and m.tuteeID = %s", [userRole])
+
+
+
+    landingswitch = {
         1: render_template('admin_home.html'),
-        3: render_template('tutee_home.html', calendar_requests=tutor_calendar.calendar_requests,
-                           calendar_upcomings=tutor_calendar.calendar_upcomings),
-        2: render_template('tutor_test.html')
+        3: render_template(userLandingPage,calendar_upcomings=meetingslist),
+        2: render_template('tutor_test.html', calendar_requests=tutor_calendar.calendar_requests,
+                           calendar_upcomings=tutor_calendar.calendar_upcomings)
     }
-    return switch.get(userRole, render_template('error_page.html'))
+
+    resp = make_response(landingswitch.get(userRole, render_template('error_page.html')))
+    # resp.set_cookie('meeting_number', "1000121")
+    resp.set_cookie('display_name', userName)
+    return resp
 
 
 

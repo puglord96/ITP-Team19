@@ -12,6 +12,12 @@ class User:
     def getUserRole(self):
         return self.details[3]
 
+    def getUserName(self):
+        return self.details[4] + " " + self.details[5]
+
+    def getUserID(self):
+        return self.details[0]
+
 
 class TuteeUser(User):
     def __init__(self, UserDetails):

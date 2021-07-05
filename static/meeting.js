@@ -67,7 +67,7 @@ function websdkready() {
         ZoomMtg.i18n.reload(meetingConfig.lang);
         ZoomMtg.join({
           meetingNumber: meetingConfig.meetingNumber,
-          userName: meetingConfig.userName,
+          userName: meetingConfig.userName.replaceAll('"',""),
           signature: signature,
           apiKey: meetingConfig.apiKey,
           userEmail: meetingConfig.userEmail,
