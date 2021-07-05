@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, flash
+from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, make_response
 from database import SingletonDatabase
 from UserSingleton import UserSingleton
 from scripts import tutor_calendar
@@ -60,13 +60,25 @@ def login():
 
 
 @app.route('/')
+def create_zoom_test():
+    tuteeid = DatabaseInstance.executeSelectOneQuery("select u.firstname from user u, meeting m where u.userID = m.tuteeid and m.meetingID = 2")
+    venue = DatabaseInstance.executeSelectOneQuery("select venue from meeting where meetingID = 2")[0]
+    print(venue)
+
+    resp = make_response(render_template("create_zoom.html",tuteeid = tuteeid, venue = venue))
+    resp.set_cookie('meeting_number',venue)
+    resp.set_cookie('name',"hello world")
+    return resp
+
+
+@app.route('/ztest')
 def zoom_test():
     # Creating a meeting
-    meeting = client.meetings.create_meeting('Test Meeting', start_time=dt.now().isoformat(), duration_min=60,
-                                             password='password')
+    # meeting = client.meetings.create_meeting('Test Meeting', start_time=dt.now().isoformat(), duration_min=60,
+    #                                          password='password')
 
-    # client.meetings.delete_meeting(81168760280)
-    print(meeting.id)
+    # client.meetings.delete_meeting(86705874597)
+    # print(meeting.id)
     return render_template("zoom_meeting_test.html")
 
 
@@ -231,7 +243,7 @@ def UpdateProfile():
     profilePic = ""
     if user[11]:
         profilePic = b64encode(user[11]).decode("utf-8")
-    
+
     userExpertisesList = DatabaseInstance.executeSelectOneQueryWithParameters(
         'SELECT EssayWriting, ReportWriting, OralPresentation, GrammarCheck, SpellingCheck FROM userexpertises WHERE UserID = (%s)',
         [user[0]])

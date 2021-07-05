@@ -54,7 +54,7 @@
         }
     </style>
 
-    <nav id="nav-tool" class="navbar navbar-inverse navbar-fixed-top">
+  {#  <nav id="nav-tool" class="navbar navbar-inverse navbar-fixed-top" style="visibility: hidden;">
         <div class="container">
             <div class="navbar-header">
                 <a class="navbar-brand" href="#">Zoom WebSDK</a>
@@ -62,7 +62,7 @@
             <div id="navbar" class="websdktest">
                 <form class="navbar-form navbar-right" id="meeting_form">
                     <div class="form-group">
-                        <input type="text" name="display_name" id="display_name" value="1.9.6#CDN" maxLength="100"
+                        <input type="text" name="display_name" id="display_name" maxLength="100"
                             placeholder="Name" class="form-control" required>
                     </div>
                     <div class="form-group">
@@ -119,13 +119,9 @@
             </div>
             <!--/.navbar-collapse -->
         </div>
-    </nav>
+    </nav>#}
 
 
-    <div id="show-test-tool">
-        <button type="submit" class="btn btn-primary" id="show-test-tool-btn"
-            title="show or hide top test tool">Show</button>
-    </div>
     <script>
         document.getElementById('show-test-tool-btn').addEventListener("click", function (e) {
             var textContent = e.target.textContent;
