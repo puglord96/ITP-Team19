@@ -45,7 +45,7 @@
                     events: [
                         {% for calendar_upcoming in calendar_upcomings %}
                             {
-                                id:'{{calendar_upcoming[6]}}',
+                                id:['{{calendar_upcoming[6]}}','{{ calendar_upcoming[7]}}'],
                                 groupId: '{{ calendar_upcoming[0] + " " + calendar_upcoming[1] }}',
                                 title : '{{ calendar_upcoming[5] }}',
                                 start : '{{ calendar_upcoming[3] }}',
@@ -59,16 +59,18 @@
 {#                        alert('Event: ' + info.event.title);
                         alert('Start: ' + info.event.start);
                         alert('Zoom Link: ' + info.event.url);#}
+                        var IdStatusArray = info.event.id.split(",")
                         document.getElementById("meeting_details").innerHTML=
                             "<p>"+
                             "Tutor: " + info.event.groupId + "<br>"+
                             "Title: "+ info.event.title + "<br>" +
                             "Date and Time: "+ info.event.start + "<br>"+
+                            "Status: " + IdStatusArray[1]+ "<br>"+
                         "</p>"+
                         "<a href='{{ url_for('zoom_test') }}' class='btn btn-primary'>Go to Meeting</a>";
 
                         document.cookie="meeting_number=".concat(info.event.url);
-                        document.cookie="meeting_id=".concat(info.event.id);
+                        document.cookie="meeting_id=".concat(IdStatusArray[0]);
                     }
                 });
                 calendar.render();

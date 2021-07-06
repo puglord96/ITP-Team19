@@ -59,6 +59,8 @@ def feedback():
         elif userRole == 3:
             DatabaseInstance.executeUpdateQueryWithParameters(
                 "update meeting set tuteesurvey = 'done' where meetingid = %s", [meetingid])
+
+        return redirect('/home')
     return render_template("feedback.html", tutortuteename=tutortuteename)
 
 
@@ -105,23 +107,24 @@ def meeting():
 @app.route('/home')
 def home():
 
-
+    userID = UserInstance.getUser().getUserID()
     userRole = UserInstance.getUser().getUserRole()
     userName = UserInstance.getUser().getUserName()
     userLandingPage = UserInstance.getUser().landing_page
 
-    if userRole == 2:
-        meetingslist = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid from user u,meeting m where m.tuteeID = u.UserID and m.tuteeID = %s", [userRole])
+
+    if userRole == 3:
+        upcomingmeetingslist = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid,s.description from user u,meeting m,statustype s where m.tutorID = u.UserID and m.tuteeID = %s and s.statusid = m.statusID", [userID])
     else:
-        meetingslist = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid from user u,meeting m where m.tutorID = u.UserID and m.tuteeID = %s", [userRole])
+        upcomingmeetingslist = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid from user u,meeting m where m.tutorID = u.UserID and m.tuteeID = %s and statusID = 1", [userID])
+        requestmeetingslist = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid from user u,meeting m where m.tutorID = u.UserID and m.tuteeID = %s and statusID = 2", [userID])
 
-
-
+    print(upcomingmeetingslist)
     landingswitch = {
         1: render_template(userLandingPage),
-        3: render_template(userLandingPage,calendar_upcomings=meetingslist),
-        2: render_template('tutor_home.html', calendar_requests=tutor_calendar.calendar_requests,
-                           calendar_upcomings=tutor_calendar.calendar_upcomings)
+        3: render_template(userLandingPage,calendar_upcomings=upcomingmeetingslist),
+        # 2: render_template(userLandingPage, calendar_requests=tutor_calendar.calendar_requests,
+        #                    calendar_upcomings=tutor_calendar.calendar_upcomings)
     }
 
     resp = make_response(landingswitch.get(userRole, render_template('error_page.html')))
