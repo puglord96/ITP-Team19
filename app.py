@@ -110,9 +110,6 @@ def home():
     userName = UserInstance.getUser().getUserName()
     userLandingPage = UserInstance.getUser().landing_page
 
-    print(userRole)
-
-
     if userRole == 2:
         meetingslist = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid from user u,meeting m where m.tuteeID = u.UserID and m.tuteeID = %s", [userRole])
     else:
@@ -123,7 +120,7 @@ def home():
     landingswitch = {
         1: render_template(userLandingPage),
         3: render_template(userLandingPage,calendar_upcomings=meetingslist),
-        2: render_template(userLandingPage, calendar_requests=tutor_calendar.calendar_requests,
+        2: render_template('tutor_home.html', calendar_requests=tutor_calendar.calendar_requests,
                            calendar_upcomings=tutor_calendar.calendar_upcomings)
     }
 
