@@ -23,8 +23,10 @@ class TuteeUser(User):
     def __init__(self, UserDetails):
         super().__init__(UserDetails)
         self.landing_page = "tutee_home.html"
+        self.feedback_subject_role = 2
 
-    pass
+    def updateFeedbackString(self,meetingid):
+        return "update meeting set tuteesurvey = 'done' where meetingid = " + meetingid
 
     # Implement other exclusive functions of the tutor here
 
@@ -33,6 +35,10 @@ class TutorUser(User):
     def __init__(self, UserDetails):
         super().__init__(UserDetails)
         self.landing_page = "tutor_home.html"
+        self.feedback_subject_role = 3
+
+    def updateFeedbackString(self,meetingid):
+        return "update meeting set tutorsurvey = 'done' where meetingid = " + meetingid
 
     # Implement other exclusive functions of the tutor here
 
@@ -41,6 +47,7 @@ class AdminUser(User):
     def __init__(self, UserDetails):
         super().__init__(UserDetails)
         self.landing_page = "admin_home.html"
+
 
     # Implement other exclusive functions of the Admin here
 

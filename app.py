@@ -31,15 +31,9 @@ UserFactory = UserFactory()
 @app.route('/feedback', methods=['GET', 'POST'])
 def feedback():
     tutortuteename = DatabaseInstance.getUserDetails(2)[4] + " " + DatabaseInstance.getUserDetails(2)[5]
-    userRole = UserInstance.getUser().getUserRole()
+    subjectRole = UserInstance.getUser().feedback_subject_role
 
     meetingid = request.cookies.get("meeting_id")
-
-    if userRole == 2:
-        subjectRole = 3
-    else:
-        subjectRole = 2
-
 
 
     if request.method == "POST":
@@ -48,17 +42,11 @@ def feedback():
         feedbacktutortuteerating = request.form.get('tutortuteerating')
         feedbackremarks = request.form.get('remarks')
 
-
         DatabaseInstance.executeInsertQueryWithParameters(
             "Insert into feedback(sessionrating,tutortuteerating,remark,tutortuteename,subjectrole) values(%s,%s,%s,%s,%s)",
-            [feedbacksessionrating, feedbacktutortuteerating, feedbackremarks, feedbacktuteetutor,subjectRole])
+            [feedbacksessionrating, feedbacktutortuteerating, feedbackremarks, feedbacktuteetutor, subjectRole])
 
-        if userRole == 2:
-            DatabaseInstance.executeUpdateQueryWithParameters(
-                "update meeting set tutorsurvey = 'done' where meetingid = %s", [meetingid])
-        elif userRole == 3:
-            DatabaseInstance.executeUpdateQueryWithParameters(
-                "update meeting set tuteesurvey = 'done' where meetingid = %s", [meetingid])
+        DatabaseInstance.executeUpdateQuery(UserInstance.getUser().updateFeedbackString(meetingid))
 
         return redirect('/home')
     return render_template("feedback.html", tutortuteename=tutortuteename)
@@ -80,8 +68,6 @@ def login():
     return render_template('login.html')
 
 
-
-
 @app.route('/ztest')
 def zoom_test():
     # Creating a meeting
@@ -93,7 +79,7 @@ def zoom_test():
     return render_template("zoom_meeting_test.html")
 
 
-@app.route('/sessionbooking', methods=['GET','POST'])
+@app.route('/sessionbooking', methods=['GET', 'POST'])
 def session_booking():
     disciplinelist = DatabaseInstance.executeSelectMultipleQuery("Select name from degree")
     return render_template("session_booking.html", disciplinelist=disciplinelist)
@@ -106,25 +92,30 @@ def meeting():
 
 @app.route('/home')
 def home():
-
+    global upcomingmeetingslist, requestmeetingslist
     userID = UserInstance.getUser().getUserID()
     userRole = UserInstance.getUser().getUserRole()
     userName = UserInstance.getUser().getUserName()
     userLandingPage = UserInstance.getUser().landing_page
 
-
     if userRole == 3:
-        upcomingmeetingslist = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid,s.description from user u,meeting m,statustype s where m.tutorID = u.UserID and m.tuteeID = %s and s.statusid = m.statusID", [userID])
-    else:
-        upcomingmeetingslist = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid from user u,meeting m where m.tutorID = u.UserID and m.tuteeID = %s and statusID = 1", [userID])
-        requestmeetingslist = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid from user u,meeting m where m.tutorID = u.UserID and m.tuteeID = %s and statusID = 2", [userID])
+        upcomingmeetingslist = DatabaseInstance.executeSelectMultipleQueryWithParameters(
+            "SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid,s.description from user u,meeting m,statustype s where m.tutorID = u.UserID and m.tuteeID = %s and s.statusid = m.statusID",
+            [userID])
+        requestmeetingslist = ""
+    elif userRole == 2:
+        upcomingmeetingslist = DatabaseInstance.executeSelectMultipleQueryWithParameters(
+            "SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid from user u,meeting m where m.tuteeID = u.UserID and m.tutorID = %s and statusID = 1",
+            [userID])
+        requestmeetingslist = DatabaseInstance.executeSelectMultipleQueryWithParameters(
+            "SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid from user u,meeting m where m.tuteeID = u.UserID and m.tutorID = %s and statusID = 2",
+            [userID])
 
-    print(upcomingmeetingslist)
     landingswitch = {
         1: render_template(userLandingPage),
-        3: render_template(userLandingPage,calendar_upcomings=upcomingmeetingslist),
-        # 2: render_template(userLandingPage, calendar_requests=tutor_calendar.calendar_requests,
-        #                    calendar_upcomings=tutor_calendar.calendar_upcomings)
+        3: render_template(userLandingPage, calendar_upcomings=upcomingmeetingslist),
+        2: render_template(userLandingPage, calendar_requests=requestmeetingslist,
+                           calendar_upcomings=upcomingmeetingslist)
     }
 
     resp = make_response(landingswitch.get(userRole, render_template('error_page.html')))
@@ -133,13 +124,12 @@ def home():
     return resp
 
 
-
 @app.route('/tutor_upcoming_meeting')
 def tutee_upcoming_meeting():
     userRole = UserInstance.getUser().getUserRole()
     if userRole == 2:
         return render_template("tutor_upcoming_meeting.html", calendar_upcomings=tutor_calendar.calendar_upcomings)
-    return render_template ("error_page.html")
+    return render_template("error_page.html")
 
 
 @app.route('/forgot_password')
@@ -282,14 +272,17 @@ def UpdateProfile():
                            profilePic=profilePic, expertisesList=expertisesList, timeSlotList=timeSlotList,
                            userExpertisesList=userExpertisesList, userTimeSlotList=userTimeSlotList)
 
+
 @app.route('/admin')
-def index(chartID = 'container', chart_type = 'line', chart_height = 350):
-	chart = {"renderTo": chartID, "type": chart_type, "height": chart_height,}
-	series = [{'name': 'data1', "data": [1,2,3]}, {"name": 'data2', "data": [4, 5, 6]}]
-	title = {"{text": 'Today}'}
-	xAxis = {"categories": ['xAxis Data1', 'xAxis Data2']}
-	yAxis = {"title": {"text": 'yAxis Label'}}
-	return render_template('admin_home.html', chartID=chartID, chart=chart, series=series, title=title, xAxis=xAxis, yAxis=yAxis)
+def index(chartID='container', chart_type='line', chart_height=350):
+    chart = {"renderTo": chartID, "type": chart_type, "height": chart_height, }
+    series = [{'name': 'data1', "data": [1, 2, 3]}, {"name": 'data2', "data": [4, 5, 6]}]
+    title = {"{text": 'Today}'}
+    xAxis = {"categories": ['xAxis Data1', 'xAxis Data2']}
+    yAxis = {"title": {"text": 'yAxis Label'}}
+    return render_template('admin_home.html', chartID=chartID, chart=chart, series=series, title=title, xAxis=xAxis,
+                           yAxis=yAxis)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
