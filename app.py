@@ -63,8 +63,12 @@ def login():
                 userDetailList = DatabaseInstance.getDetailListOfUser(formEmail)
                 user = UserFactory.createUser(userDetailList)
                 UserInstance.setUser(user)
+                zoomRole = UserInstance.getUser().getZoomRole()
 
-                return redirect('/home')
+                resp = make_response(redirect('/home'))
+                resp.set_cookie('zoom_role',str(zoomRole))
+
+                return resp
     return render_template('login.html')
 
 

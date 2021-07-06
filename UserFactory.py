@@ -24,6 +24,7 @@ class TuteeUser(User):
         super().__init__(UserDetails)
         self.landing_page = "tutee_home.html"
         self.feedback_subject_role = 2
+        self.zoomRole = 0
 
     def updateFeedbackString(self,meetingid):
         return "update meeting set tuteesurvey = 'done' where meetingid = " + meetingid
@@ -34,12 +35,21 @@ class TuteeUser(User):
     def requestMeetingsList(self,userID):
         return None
 
+    def getZoomRole(self):
+        return self.zoomRole
+
+
+
 
 class TutorUser(User):
     def __init__(self, UserDetails):
         super().__init__(UserDetails)
         self.landing_page = "tutor_home.html"
         self.feedback_subject_role = 3
+        self.zoomRole = 1
+
+    def getZoomRole(self):
+        return self.zoomRole
 
     def updateFeedbackString(self,meetingid):
         return "update meeting set tutorsurvey = 'done' where meetingid = " + meetingid

@@ -38,7 +38,7 @@ var testTool = {
       mn: testTool.getCookie("meeting_number"),
       name: testTool.getCookie("display_name"),
       pwd: "password",
-      role: 1,
+      role: testTool.getCookie("zoom_role"),
       email: "",
       lang: "en-US",
       signature: "",
