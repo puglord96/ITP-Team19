@@ -24,13 +24,27 @@
 
                 </div>
 
-                <div class="card">
-                    <h5 class="card-header bg-bluetheme">Session Details</h5>
-                    <div class="card-body" id="meeting_details">
-
-                    </div>
-                </div>
             </div>
+
+        <!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Session Details</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="meeting_details">
+        ...
+      </div>
+      <div class="modal-footer" id="zoom_button">
+
+      </div>
+    </div>
+  </div>
+</div>
             {#            <div class="col">
                 <h3>Meeting Requests</h3>
                 <div class="jumbotron jumbotron-fluid" style="padding:20px;">
@@ -64,15 +78,21 @@
                         alert('Start: ' + info.event.start);
                         alert('Zoom Link: ' + info.event.url);#}
                         var IdStatusArray = info.event.id.split(",")
+                        $('#exampleModal').modal('show');
                         document.getElementById("meeting_details").innerHTML=
                             "<p>"+
                             "Tutor: " + info.event.groupId + "<br>"+
                             "Title: "+ info.event.title + "<br>" +
                             "Date and Time: "+ info.event.start + "<br>"+
                             "Status: " + IdStatusArray[1]+ "<br>"+
-                        "</p>"+
-                        "<a href='{{ url_for('zoom_test') }}' class='btn btn-primary'>Go to Meeting</a>";
+                        "</p>";
 
+                        if (IdStatusArray[1] === "Accepted"){
+                            document.getElementById("zoom_button").innerHTML=
+                                " <a href='{{ url_for('zoom_test') }}' class='btn btn-primary'>Go to Meeting</a>";
+                        } else{
+                            document.getElementById("zoom_button").innerHTML="";
+                        }
                         document.cookie="meeting_number=".concat(info.event.url);
                         document.cookie="meeting_id=".concat(IdStatusArray[0]);
                     }
