@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col">
             <div class="jumbotron jumbotron-fluid" style="padding:20px;">
-                                     <h3 style="text-align: center;">Meetings</h3>
+               <h3 style="text-align: center;">Meeting Requests</h3>
 
                 <div class='container-fluid' id="calendar" style="width: 50%">
 
@@ -19,14 +19,14 @@
                       let calendar = new FullCalendar.Calendar(calendarEl, {
                       initialView: 'listMonth',
                       events: [
-                      {% for calendar_upcoming in calendar_upcomings %}
+                        {% for calendar_request in calendar_requests %}
                             {
-                                id:['{{calendar_upcoming[6]}}','{{ calendar_upcoming[7]}}'],
-                                groupId: '{{ calendar_upcoming[0] + " " + calendar_upcoming[1] }}',
-                                title : '{{ calendar_upcoming[5] }}',
-                                start : '{{ calendar_upcoming[3] }}',
-                                url: '{{ calendar_upcoming[2] }}',
-                                color:'{{ calendar_upcoming[8] }}',
+                                id:['{{calendar_request[6]}}','{{ calendar_request[7]}}'],
+                                groupId: '{{ calendar_request[0] + " " + calendar_request[1] }}',
+                                title : '{{ calendar_request[5] }}',
+                                start : '{{ calendar_request[3] }}',
+                                url: '{{ calendar_request[2] }}',
+                                color:'{{ calendar_request[8] }}',
                                 display:'block'
                             },
                         {% endfor %}

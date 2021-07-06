@@ -60,6 +60,23 @@ class TutorUser(User):
     def requestMeetingsList(self,userID):
         return "SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid from user u,meeting m where m.tuteeID = u.UserID and m.tutorID = " + str(userID) + "  and statusID = 2"
 
+    def requestMeeting(self, meetingid):
+        return "SELECT * FROM meeting WHERE meetingid = " + meetingid
+
+    def getUser(self, userID):
+        return "SELECT firstname, lastname FROM user WHERE userid = " + userID
+
+    def getstatustype(self, statustype):
+        return "select description from statustype where statusid = " + statustype
+
+    def getMeetingType(self, meetingtypeid):
+        return "SELECT description from meetingtype where meetingtypeid = " + meetingtypeid
+
+    def acceptRequest(self, meetingid):
+        return "update meeting set statusid = 1 where meetingid = " + meetingid
+
+    def declineRequest(self, meetingid):
+        return "update meeting set statusid = 3 where meetingid = " + meetingid
 
 class AdminUser(User):
     def __init__(self, UserDetails):

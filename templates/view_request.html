@@ -1,0 +1,57 @@
+{% extends "tutor_layout.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <div class="jumbotron jumbotron-fluid" style="padding:20px;">
+                <h3 style="text-align: center;">{{ meetingid }}</h3>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+<table id="data" class="display" style="width:100%">
+    <thead>
+    <tr>
+        <th>Tutor Name</th>
+        <th>Tutee Name</th>
+        <th>Meeting Type</th>
+        <th>Status</th>
+        <th>Venue</th>
+        <th>Start Time</th>
+        <th>End Time</th>
+        <th>Topic</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>{{tutorname}}</td>
+        <td>{{tuteename}}</td>
+        <td>{{meetingtype}}</td>
+        <td>{{status}}</td>
+        <td>{{venue}}</td>
+        <td>{{starttime}}</td>
+        <td>{{endtime}}</td>
+        <td>{{topic}}</td>
+    </tr>
+    </tbody>
+</table>
+</div>
+<form method="POST" >
+    <div class="row" style="padding-top: 20px;">
+        <div class="col">
+            <button type="submit"  name="accept" class="btn btn-primary mb-3" value="accept">Accept</button>
+            <button type="submit"  name="decline" class="btn btn-danger mb-3" value="decline">Decline</button>
+        </div>
+    </div>
+
+</form>
+<script>
+    $(document).ready(function () {
+      $('#data').DataTable();
+    });
+
+</script>
+{% endblock content %}

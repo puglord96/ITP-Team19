@@ -6,6 +6,7 @@ from pyzoom import ZoomClient
 from UserFactory import *
 from datetime import datetime as dt
 from base64 import b64encode
+import json
 import os
 
 app = Flask(__name__)
@@ -51,7 +52,9 @@ def feedback():
         return redirect('/home')
     return render_template("feedback.html", tutortuteename=tutortuteename)
 
-
+# 1 - Admin
+# 2 - Tutor
+# 3 - Tutee
 @app.route('/', methods=['GET', 'POST'])
 def login():
     userlist = DatabaseInstance.executeSelectMultipleQuery("Select email,password from user")
@@ -127,11 +130,65 @@ def home():
 
 
 @app.route('/tutor_upcoming_meeting')
-def tutee_upcoming_meeting():
+def tutor_upcoming_meeting():
     userRole = UserInstance.getUser().getUserRole()
     if userRole == 2:
-        return render_template("tutor_upcoming_meeting.html", calendar_upcomings=tutor_calendar.calendar_upcomings)
+        print(upcomingmeetingslist)
+        return render_template("tutor_upcoming_meeting.html", calendar_upcomings=upcomingmeetingslist)
     return render_template("error_page.html")
+
+
+@app.route('/tutor_upcoming_request')
+def tutor_upcoming_request():
+    userRole = UserInstance.getUser().getUserRole()
+    if userRole == 2:
+        print(requestmeetingslist)
+        return render_template("tutor_upcoming_request.html", calendar_requests=requestmeetingslist)
+    return render_template("error_page.html")
+
+
+@app.route('/view_request/<meetingid>', methods=['GET', 'POST'])
+def view_request(meetingid):
+    if request.method == "POST":
+        if request.form.get('accept'):
+            print("accept")
+            DatabaseInstance.executeUpdateQuery(UserInstance.getUser().acceptRequest(meetingid))
+            return redirect('/home')
+        elif request.form.get("decline"):
+            print("decline")
+            DatabaseInstance.executeUpdateQuery(UserInstance.getUser().declineRequest(meetingid))
+            return redirect('/home')
+    userRole = UserInstance.getUser().getUserRole()
+    if userRole == 2:
+        requestMeeting = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().requestMeeting(meetingid))
+        print(requestMeeting[0])
+        print(requestMeeting[0][5])
+        tutorname = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().getUser(str(requestMeeting[0][1])))
+        tutorname = tutorname[0][0] + " " + tutorname[0][1]
+        tuteename = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().getUser(str(requestMeeting[0][2])))
+        tuteename = tuteename[0][0] + " " + tuteename[0][1]
+        meetingtype = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().getMeetingType(str(requestMeeting[0][3])))
+        meetingtype = meetingtype[0][0]
+        status = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().getstatustype(str(requestMeeting[0][4])))
+        status = status[0][0]
+        venue = requestMeeting[0][5]
+        attendance = requestMeeting[0][6]
+        starttime = requestMeeting[0][7]
+        endtime = requestMeeting[0][8]
+        topic = requestMeeting[0][12]
+        return render_template('view_request.html', meetingid=meetingid, tutorname=tutorname, tuteename=tuteename,
+                               meetingtype=meetingtype, status=status, venue=venue, attendance=attendance, starttime=starttime
+                               , endtime=endtime, topic=topic)
+
+    return render_template("error_page.html")
+
+
+# @app.route('/view_request/<string:meetingid>', methods=['POST'])
+# def view_request(meetingid):
+#     meetingid = json.loads(meetingid)
+#     meetingid = meetingid['id'][:-1]
+#     print(meetingid)
+#     return redirect(url_for('tutor_test', meetingid=meetingid))
 
 
 @app.route('/forgot_password')
