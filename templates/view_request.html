@@ -49,9 +49,12 @@
 
 </form>
 <script>
-    $(document).ready(function () {
-      $('#data').DataTable();
-    });
-
+    $(document).ready(function() {
+    $('#data').DataTable( {
+        "paging":   false,
+        "ordering": false,
+        "info":     false
+    } );
+} );
 </script>
 {% endblock content %}
