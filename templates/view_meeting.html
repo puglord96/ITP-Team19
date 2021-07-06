@@ -4,7 +4,7 @@
     <div class="row">
         <div class="col">
             <div class="jumbotron jumbotron-fluid" style="padding:20px;">
-                <h3 style="text-align: center;">Meeting Request on {{ starttime }}</h3>
+                <h3 style="text-align: center;">Meeting on {{ starttime }}</h3>
             </div>
 
         </div>
@@ -39,15 +39,15 @@
     </tbody>
 </table>
 </div>
-<form method="POST" >
-    <div class="row" style="padding-top: 20px;">
-        <div class="col">
-            <button type="submit"  name="accept" class="btn btn-primary mb-3" value="accept">Accept</button>
-            <button type="submit"  name="decline" class="btn btn-danger mb-3" value="decline">Decline</button>
-        </div>
-    </div>
+<!--<form method="POST" >-->
+<!--    <div class="row" style="padding-top: 20px;">-->
+<!--        <div class="col">-->
+<!--            <button type="submit"  name="accept" class="btn btn-primary mb-3" value="accept">Accept</button>-->
+<!--            <button type="submit"  name="decline" class="btn btn-danger mb-3" value="decline">Decline</button>-->
+<!--        </div>-->
+<!--    </div>-->
 
-</form>
+<!--</form>-->
 <script>
     $(document).ready(function () {
       $('#data').DataTable();

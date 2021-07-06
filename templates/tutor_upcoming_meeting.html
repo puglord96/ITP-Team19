@@ -37,6 +37,14 @@ eventClick: function(info){
                             alert('Event: ' + info.event.title);
                             alert('Start: ' + info.event.start);
                             alert('Zoom Link: ' + info.event.url);
+                            if (confirm('Do you want to view this meeting request?')) {
+                              // View Request
+                              alert('Redirecting...');
+                                let url = "/view_meeting/";
+                                window.location = url.concat(info.event.id.slice(0, -1));
+                            } else {
+                              // Do nothing!
+                            }
                     },
                       eventDidMount: function(info) {
                         if (info.event.extendedProps.status === 'done') {
