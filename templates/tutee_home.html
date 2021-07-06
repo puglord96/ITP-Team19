@@ -42,6 +42,7 @@
             <script>
                 let calendarEl = document.getElementById('calendar');
                 let calendar = new FullCalendar.Calendar(calendarEl, {
+                    contentHeight:550,
                     events: [
                         {% for calendar_upcoming in calendar_upcomings %}
                             {
@@ -49,9 +50,12 @@
                                 groupId: '{{ calendar_upcoming[0] + " " + calendar_upcoming[1] }}',
                                 title : '{{ calendar_upcoming[5] }}',
                                 start : '{{ calendar_upcoming[3] }}',
-                                url: '{{ calendar_upcoming[2] }}'
+                                url: '{{ calendar_upcoming[2] }}',
+                                color:'{{ calendar_upcoming[8] }}',
+                                display:'block'
                             },
                         {% endfor %}
+
                     ],
                     eventClick: function(info){
                         <!-- prevent default prevents redirecting to the URL-->

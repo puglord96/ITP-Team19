@@ -30,7 +30,7 @@ class TuteeUser(User):
         return "update meeting set tuteesurvey = 'done' where meetingid = " + meetingid
 
     def upcomingMeetingsList(self,userID):
-        return "SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid,s.description from user u,meeting m,statustype s where m.tutorID = u.UserID and m.tuteeID = "+str(userID)+" and s.statusid = m.statusID"
+        return "SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid,s.description,s.calcolour from user u,meeting m,statustype s where m.tutorID = u.UserID and m.tuteeID = "+str(userID)+" and s.statusid = m.statusID"
 
     def requestMeetingsList(self,userID):
         return None
