@@ -31,15 +31,34 @@ UserFactory = UserFactory()
 @app.route('/feedback', methods=['GET', 'POST'])
 def feedback():
     tutortuteename = DatabaseInstance.getUserDetails(2)[4] + " " + DatabaseInstance.getUserDetails(2)[5]
+    userRole = UserInstance.getUser().getUserRole()
+
+    meetingid = request.cookies.get("meeting_id")
+
+    if userRole == 2:
+        subjectRole = 3
+    else:
+        subjectRole = 2
+
+
+
     if request.method == "POST":
         feedbacktuteetutor = request.form.get('tutortuteename')
         feedbacksessionrating = request.form.get('sessionrating')
         feedbacktutortuteerating = request.form.get('tutortuteerating')
         feedbackremarks = request.form.get('remarks')
 
+
         DatabaseInstance.executeInsertQueryWithParameters(
-            "Insert into feedback(sessionrating,tutortuteerating,remark,tutortuteename) values(%s,%s,%s,%s)",
-            [feedbacksessionrating, feedbacktutortuteerating, feedbackremarks, feedbacktuteetutor])
+            "Insert into feedback(sessionrating,tutortuteerating,remark,tutortuteename,subjectrole) values(%s,%s,%s,%s,%s)",
+            [feedbacksessionrating, feedbacktutortuteerating, feedbackremarks, feedbacktuteetutor,subjectRole])
+
+        if userRole == 2:
+            DatabaseInstance.executeUpdateQueryWithParameters(
+                "update meeting set tutorsurvey = 'done' where meetingid = %s", [meetingid])
+        elif userRole == 3:
+            DatabaseInstance.executeUpdateQueryWithParameters(
+                "update meeting set tuteesurvey = 'done' where meetingid = %s", [meetingid])
     return render_template("feedback.html", tutortuteename=tutortuteename)
 
 
@@ -91,20 +110,20 @@ def home():
     userName = UserInstance.getUser().getUserName()
     userLandingPage = UserInstance.getUser().landing_page
 
-
+    print(userRole)
 
 
     if userRole == 2:
-        meetingslist = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic from user u,meeting m where m.tutorID = u.UserID and m.tuteeID = %s", [userRole])
+        meetingslist = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid from user u,meeting m where m.tuteeID = u.UserID and m.tuteeID = %s", [userRole])
     else:
-        meetingslist = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic from user u,meeting m where m.tuteeID = u.UserID and m.tuteeID = %s", [userRole])
+        meetingslist = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid from user u,meeting m where m.tutorID = u.UserID and m.tuteeID = %s", [userRole])
 
 
 
     landingswitch = {
-        1: render_template('admin_home.html'),
+        1: render_template(userLandingPage),
         3: render_template(userLandingPage,calendar_upcomings=meetingslist),
-        2: render_template('tutor_test.html', calendar_requests=tutor_calendar.calendar_requests,
+        2: render_template(userLandingPage, calendar_requests=tutor_calendar.calendar_requests,
                            calendar_upcomings=tutor_calendar.calendar_upcomings)
     }
 

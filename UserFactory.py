@@ -32,7 +32,7 @@ class TuteeUser(User):
 class TutorUser(User):
     def __init__(self, UserDetails):
         super().__init__(UserDetails)
-        self.landing_page = "tutee_home.html"
+        self.landing_page = "tutor_home.html"
 
     # Implement other exclusive functions of the tutor here
 
