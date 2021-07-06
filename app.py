@@ -97,19 +97,17 @@ def home():
     userRole = UserInstance.getUser().getUserRole()
     userName = UserInstance.getUser().getUserName()
     userLandingPage = UserInstance.getUser().landing_page
+    upcomingmeetingslistquery = UserInstance.getUser().upcomingMeetingsList(userID)
+    requestmeetingslistquery = UserInstance.getUser().requestMeetingsList(userID)
 
-    if userRole == 3:
-        upcomingmeetingslist = DatabaseInstance.executeSelectMultipleQueryWithParameters(
-            "SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid,s.description from user u,meeting m,statustype s where m.tutorID = u.UserID and m.tuteeID = %s and s.statusid = m.statusID",
-            [userID])
+
+    upcomingmeetingslist = DatabaseInstance.executeSelectMultipleQuery(upcomingmeetingslistquery)
+
+    if requestmeetingslistquery is not None:
+        requestmeetingslist = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().requestMeetingsList(userID))
+    else:
         requestmeetingslist = ""
-    elif userRole == 2:
-        upcomingmeetingslist = DatabaseInstance.executeSelectMultipleQueryWithParameters(
-            "SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid from user u,meeting m where m.tuteeID = u.UserID and m.tutorID = %s and statusID = 1",
-            [userID])
-        requestmeetingslist = DatabaseInstance.executeSelectMultipleQueryWithParameters(
-            "SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid from user u,meeting m where m.tuteeID = u.UserID and m.tutorID = %s and statusID = 2",
-            [userID])
+
 
     landingswitch = {
         1: render_template(userLandingPage),

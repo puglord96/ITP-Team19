@@ -28,7 +28,11 @@ class TuteeUser(User):
     def updateFeedbackString(self,meetingid):
         return "update meeting set tuteesurvey = 'done' where meetingid = " + meetingid
 
-    # Implement other exclusive functions of the tutor here
+    def upcomingMeetingsList(self,userID):
+        return "SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid,s.description from user u,meeting m,statustype s where m.tutorID = u.UserID and m.tuteeID = "+str(userID)+" and s.statusid = m.statusID"
+
+    def requestMeetingsList(self,userID):
+        return None
 
 
 class TutorUser(User):
@@ -40,7 +44,11 @@ class TutorUser(User):
     def updateFeedbackString(self,meetingid):
         return "update meeting set tutorsurvey = 'done' where meetingid = " + meetingid
 
-    # Implement other exclusive functions of the tutor here
+    def upcomingMeetingsList(self,userID):
+        return "SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid from user u,meeting m where m.tuteeID = u.UserID and m.tutorID = "+str(userID)+"  and statusID = 1"
+
+    def requestMeetingsList(self,userID):
+        return "SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid from user u,meeting m where m.tuteeID = u.UserID and m.tutorID = " + str(userID) + "  and statusID = 2"
 
 
 class AdminUser(User):
