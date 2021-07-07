@@ -65,7 +65,6 @@ def login():
             if formEmail == user[0] and formPassword == user[1]:
                 userDetailList = DatabaseInstance.getDetailListOfUser(formEmail)
                 user = UserFactory.createUser(userDetailList)
-                return redirect('/admin')
                 UserInstance.setUser(user)
                 zoomRole = UserInstance.getUser().getZoomRole()
 
