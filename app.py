@@ -264,9 +264,11 @@ def DegreeByFaculty(Faculty):
         degreeArray.append(degreeOjb)
     return jsonify({'degreeList': degreeArray})
 
-@app.route('/profile', methods=['GET', 'POST'])
+@app.route('/profile')
 def profile():
     user = UserInstance.getUser().getDetailsList()
+    userRole = UserInstance.getUser().getUserRole()
+    landingpage = UserInstance.getUser().getProfileLandingPage()
 
 
     expertisesList = ['Essay Writing', 'Technical Proposal', 'Oral Presentation', 'Reader Response', 'Reflection']
@@ -284,10 +286,11 @@ def profile():
 
     userexpertise = []
     expertiseListIndex = 0
-    for expertise in userExpertisesList:
-        if expertise == 1:
-            userexpertise.append(expertisesList[expertiseListIndex])
-        expertiseListIndex +=1
+    if userExpertisesList:
+        for expertise in userExpertisesList:
+            if expertise == 1:
+                userexpertise.append(expertisesList[expertiseListIndex])
+            expertiseListIndex +=1
 
     userTimeSlotList = DatabaseInstance.executeSelectOneQueryWithParameters(
         'SELECT Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday FROM usertimeslotpreference WHERE UserID = (%s)',
@@ -295,15 +298,26 @@ def profile():
 
     timeslot = []
     timeslotindex = 0
-    for usertimeslot in userTimeSlotList:
-        if usertimeslot == 1:
-            timeslot.append(timeSlotList[timeslotindex])
-        timeslotindex += 1
+    if userTimeSlotList:
+        for usertimeslot in userTimeSlotList:
+            if usertimeslot == 1:
+                timeslot.append(timeSlotList[timeslotindex])
+            timeslotindex += 1
 
 
-    return render_template('profile.html', faculty=faculty, degree=degree, user=user,
+    landingswitch={
+        1:render_template(landingpage, faculty=faculty, degree=degree, user=user,
                            profilePic=profilePic, expertisesList=expertisesList, timeSlotList=timeSlotList,
-                           userexpertise=userexpertise, userTimeSlotList=userTimeSlotList,gender=gender,timeslot=timeslot)
+                           userexpertise=userexpertise, userTimeSlotList=userTimeSlotList,gender=gender,timeslot=timeslot),
+        2:render_template(landingpage, faculty=faculty, degree=degree, user=user,
+                           profilePic=profilePic, expertisesList=expertisesList, timeSlotList=timeSlotList,
+                           userexpertise=userexpertise, userTimeSlotList=userTimeSlotList,gender=gender,timeslot=timeslot),
+        3:render_template(landingpage, faculty=faculty, degree=degree, user=user,
+                           profilePic=profilePic,gender=gender)
+    }
+    return landingswitch.get(userRole, render_template('error_page.html'))
+
+
 
 @app.route('/updateprofile', methods=['GET', 'POST'])
 def UpdateProfile():
@@ -392,6 +406,9 @@ def UpdateProfile():
     facultyList = DatabaseInstance.executeSelectMultipleQuery('SELECT * FROM faculty ORDER BY FacultyID ASC')
     degreeList = DatabaseInstance.executeSelectMultipleQueryWithParameters(
         'SELECT * FROM degree WHERE FacultyID = (%s) ORDER BY DegreeID ASC', [user[8]])
+    genderList = DatabaseInstance.executeSelectMultipleQuery('Select * from gender')
+    print(user[12])
+    print(genderList[0][0])
     profilePic = ""
     if user[11]:
         profilePic = b64encode(user[11]).decode("utf-8")
@@ -403,12 +420,13 @@ def UpdateProfile():
         'SELECT Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday FROM usertimeslotpreference WHERE UserID = (%s)',
         [user[0]])
 
+
     return render_template('update_profile.html', facultyList=facultyList, degreeList=degreeList, user=user,
                            profilePic=profilePic, expertisesList=expertisesList, timeSlotList=timeSlotList,
-                           userExpertisesList=userExpertisesList, userTimeSlotList=userTimeSlotList)
+                           userExpertisesList=userExpertisesList, userTimeSlotList=userTimeSlotList,genderList = genderList)
 
 
-@app.route('/admin') 
+@app.route('/admin')
 def admin():
     pageTitle = "Home"
     title = "Today's Successful Appointments"
@@ -435,7 +453,7 @@ def admin():
         dataHourlyComApp.append(HourlyCompletedApp[0])
     return render_template('admin_home.html', pageTitle=pageTitle, title=title, subtitle=subtitle, total=total[0], completedApp=completedApp[0], avgRating=avgRating[0], avgMeetingTime=avgMeetingTime[0], popularRequest=popularRequest[0], dataHourlyApp=dataHourlyApp, dataHourlyComApp=dataHourlyComApp)
 
-@app.route('/admin/tutormanagment') 
+@app.route('/admin/tutormanagment')
 def tutormanagment():
     pageTitle = "Tutor Managment"
     tutorList = DatabaseInstance.executeSelectMultipleQueryWithParameters(

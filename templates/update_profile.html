@@ -97,12 +97,17 @@
                             <input type="text" class="form-control" value="{{ user[5] }}" name="lastName">
                         </div>
                         <div class="col">
-                            <h6>Alias</h6>
-                            {% if user[6] %}
-                            <input type="text" class="form-control" value="{{ user[6] }}" name="alias">
-                            {% else %}
-                            <input type="text" class="form-control" value="" name="alias">
-                            {% endif %}
+                            <h6>Gender<span style='color:red;'>*</span></h6>
+                            <select class="form-control" name="Gender" id="Gender">
+                                <option value="NULL" selected>-- Please Select Gender First --</option>
+                                {% for i in genderList %}
+                                {% if i[0] == int(user[12]) %}
+                                <OPTION value={{i[0]}} selected>{{i[1]}}</OPTION>
+                                {% else %}
+                                <OPTION value={{i[0]}}>{{i[1]}}</OPTION>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
                         </div>
                     </div>
                     <div class="row" style="padding-top: 20px;">
@@ -159,7 +164,7 @@
                             <input type="password" class="form-control" placeholder="Password">
                         </div>
                     </div>
-                    {% if expertisesList %}
+                    {% if expertisesList and user[3] == 2 %}
                     <div class="row" style="padding-top: 20px;">
                         <div class="col">
                             <h6>Expertises</h6>

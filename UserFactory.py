@@ -25,7 +25,10 @@ class TuteeUser(User):
         self.landing_page = "tutee_home.html"
         self.feedback_subject_role = 2
         self.zoomRole = 0
+        self.profile_landing ="tutee_profile.html"
 
+    def getProfileLandingPage(self):
+        return self.profile_landing
 
     def updateFeedbackString(self,meetingid):
         return "update meeting set tuteesurvey = 'done' where meetingid = " + meetingid
@@ -48,9 +51,13 @@ class TutorUser(User):
         self.landing_page = "tutor_home.html"
         self.feedback_subject_role = 3
         self.zoomRole = 1
+        self.profile_landing = "tutor_profile.html"
 
     def getZoomRole(self):
         return self.zoomRole
+
+    def getProfileLandingPage(self):
+        return self.profile_landing
 
     def updateFeedbackString(self,meetingid):
         return "update meeting set tutorsurvey = 'done' where meetingid = " + meetingid
@@ -83,7 +90,10 @@ class AdminUser(User):
     def __init__(self, UserDetails):
         super().__init__(UserDetails)
         self.landing_page = "admin_home.html"
+        self.profile_landing = "tutor_profile.html"
 
+    def getProfileLandingPage(self):
+        return self.profile_landing
 
     # Implement other exclusive functions of the Admin here
 
