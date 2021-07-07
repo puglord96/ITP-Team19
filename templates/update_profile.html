@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+    <!--    <link rel="shortcut icon" href="../static/img/favicon.ico" type="image/x-icon">-->
+    <link rel="icon" href="../static/img/favicon.ico" type="image/x-icon">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="../static/code/highcharts.js"></script>
+    <script src="../static/code/modules/data.js"></script>
+    <script src="../static/code/modules/series-label.js"></script>
+    <script src="../static/code/modules/exporting.js"></script>
+    <script src="../static/code/modules/export-data.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='code/jquery.dataTables.css') }}">
+
+
+    <script src="http://code.highcharts.com/maps/modules/map.js"></script>
+
+    <!-- Additional files for the Highslide popup effect -->
+    <script src="https://www.highcharts.com/media/com_demo/js/highslide-full.min.js"></script>
+    <script src="https://www.highcharts.com/media/com_demo/js/highslide.config.js" charset="utf-8"></script>
+    <link rel="stylesheet" type="text/css" href="https://www.highcharts.com/media/com_demo/css/highslide.css" />
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+    <script src="../static/code/data.js"></script>
+    <script src="../static/code/exporting.js"></script>
+    <script src="../static/code/export-data.js"></script>
+    <script src="../static/code/Chart.js"></script>
+    <script src="../static/code/Globals.js"></script>
+    <script src="../static/code/graph.js"></script>
+    <script src="../static/code/exporting.js"></script>
+    <script src="../static/code/datatables.js"></script>
+    <style>
+        img {
+            border-radius: 50%;
+        }
+    </style>
+    {% if title %}
+    <title>Communication Helpdesk - {{ title }}</title>
+    {% else %}
+    <title>Communication Helpdesk</title>
+    {% endif %}
+</head>
+
+<body>
+    <header class="site-header">
+        <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+            <div class="container">
+                <a class="navbar-brand mr-4" href="/">Communication Helpdesk</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle"
+                    aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </nav>
+    </header>
+    <main role="main" class="container">
+        <div class="jumbotron jumbotron-fluid" style="padding:20px;">
+            <div class="container">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col">
+                            <h3>
+                                Profile
+                            </h3>
+                        </div>
+                        <div class="col">
+                            {% if profilePic %}
+                            <img src="data:;base64,{{ profilePic }}" width="100cm" height="100cm">
+                            {% else %}
+                            <img src="static\IMG\DefaultProfilePic.png" width="100cm" height="100cm">
+                            {% endif %}
+                            <br>
+                            <input type="file" name="image_file" accept="image/*">
+                        </div>
+                    </div>
+                    <div class="row" style="padding-top: 20px;">
+                        <div class="col">
+                            <h6>Email</h6>
+                            <input type="email" class="form-control" value="{{ user[1] }}" name="email">
+                        </div>
+                    </div>
+                    <div class="row" style="padding-top: 20px;">
+                        <div class="col">
+                            <h6>First Name<span style='color:red;'>*</span></h6>
+                            <input type="text" class="form-control" value="{{ user[4] }}" name="firstName">
+                        </div>
+                        <div class="col">
+                            <h6>Last Name<span style='color:red;'>*</span></h6>
+                            <input type="text" class="form-control" value="{{ user[5] }}" name="lastName">
+                        </div>
+                        <div class="col">
+                            <h6>Alias</h6>
+                            {% if user[6] %}
+                            <input type="text" class="form-control" value="{{ user[6] }}" name="alias">
+                            {% else %}
+                            <input type="text" class="form-control" value="" name="alias">
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row" style="padding-top: 20px;">
+                        <div class="col">
+                            <h6>Mobile Number<span style='color:red;'>*</span></h6>
+                            <input type="text"
+                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+                                maxlength="8" class="form-control" id="mobileNumber" name="mobileNumber"
+                                value="{{ user[7] }}">
+                        </div>
+                        <div class="col">
+                            <h6>Graduation Year<span style='color:red;'>*</span></h6>
+                            <input type="text"
+                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+                                value="{{ user[10] }}" class="form-control" id="gradyear" name="gradyear" maxlength="4">
+                        </div>
+                    </div>
+                    <div class="row" style="padding-top: 20px;">
+                        <div class="col">
+                            <h6>Cluster<span style='color:red;'>*</span></h6>
+                            <select class="form-control" name="faculty" id="faculty">
+                                <option value="NULL" selected>-- Please Select --</option>
+                                {% for i in facultyList %}
+                                {% if i[0] == user[8] %}
+                                <OPTION value={{i[0]}} selected>{{i[1]}}</OPTION>
+                                {% else %}
+                                <OPTION value={{i[0]}}>{{i[1]}}</OPTION>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col">
+                            <h6>Pursuing Degree<span style='color:red;'>*</span></h6>
+                            <select class="form-control" name="pursuingDegree" id="degree">
+                                <option value="NULL" selected>-- Please Select Cluster First --</option>
+                                {% for i in degreeList %}
+                                {% if i[0] == user[9] %}
+                                <OPTION value={{i[0]}} selected>{{i[2]}}</OPTION>
+                                {% else %}
+                                <OPTION value={{i[0]}}>{{i[2]}}</OPTION>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row" style="padding-top: 20px;">
+                        <div class="col">
+                            <h6>New Password<span style='color:red;'>*</span></h6>
+                            <input type="password" class="form-control" placeholder="8 - 16 characters long"
+                                name="password">
+                        </div>
+                        <div class="col">
+                            <h6>Confirm Password<span style='color:red;'>*</span></h6>
+                            <input type="password" class="form-control" placeholder="Password">
+                        </div>
+                    </div>
+                    {% if expertisesList %}
+                    <div class="row" style="padding-top: 20px;">
+                        <div class="col">
+                            <h6>Expertises</h6>
+                            {% for i in expertisesList %}
+                            <label>{{i}}</label>
+                            {% if userExpertisesList[loop.index0] == 1 %}
+                            <input type="checkbox" name="expertises" value="{{loop.index0}}" checked />
+                            {% else %}
+                            <input type="checkbox" name="expertises" value="{{loop.index0}}" />
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if timeSlotList and user[3] == 2 %}
+                    <div class="row" style="padding-top: 20px;">
+                        <div class="col">
+                            <h6>Time Slot Preference</h6>
+                            {% for i in timeSlotList %}
+                            <label>{{i}}</label>
+                            {% if userTimeSlotList[loop.index0] == 1 %}
+                            <input type="checkbox" name="timeSlot" value="{{loop.index0}}" checked />
+                            {% else %}
+                            <input type="checkbox" name="timeSlot" value="{{loop.index0}}" />
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="row" style="padding-top: 20px;">
+                        <div class="col">
+                            <button type="submit" class="btn btn-primary mb-3">Update</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    <script>
+        faculty_select = document.getElementById('faculty');
+        degree_select = document.getElementById('degree');
+        faculty_select.onchange = function () {
+            let optionHTML = '';
+            if (faculty_select.value == "NULL") {
+                optionHTML += '<option value="NULL">-- Please Select Cluster First --</option>'
+                degree_select.disabled = true;
+                degree_select.innerHTML = optionHTML;
+            } else {
+                fetch("/register/faculty/" + faculty_select.value).then(function (response) {
+                    response.json().then(function (data) {
+                        for (degree of data.degreeList) {
+                            optionHTML += '<option value="' + degree.id + '">' + degree.name + '</option>'
+                        }
+                        degree_select.disabled = false;
+                        degree_select.innerHTML = optionHTML;
+                    });
+                });
+            }
+        }
+    </script>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

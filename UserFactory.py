@@ -26,6 +26,7 @@ class TuteeUser(User):
         self.feedback_subject_role = 2
         self.zoomRole = 0
 
+
     def updateFeedbackString(self,meetingid):
         return "update meeting set tuteesurvey = 'done' where meetingid = " + meetingid
 

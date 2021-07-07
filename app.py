@@ -264,8 +264,48 @@ def DegreeByFaculty(Faculty):
         degreeArray.append(degreeOjb)
     return jsonify({'degreeList': degreeArray})
 
-
 @app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    user = UserInstance.getUser().getDetailsList()
+
+
+    expertisesList = ['Essay Writing', 'Technical Proposal', 'Oral Presentation', 'Reader Response', 'Reflection']
+    timeSlotList = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    gender = DatabaseInstance.executeSelectOneQueryWithParameters('Select gender from gender where gender_id = %s',[user[12]])[0]
+    faculty = DatabaseInstance.executeSelectOneQueryWithParameters('Select name from faculty where facultyid = %s',[user[8]])[0]
+    degree = DatabaseInstance.executeSelectOneQueryWithParameters('SELECT name FROM degree WHERE  DegreeID = %s', [user[9]])[0]
+    profilePic = ""
+    if user[11]:
+        profilePic = b64encode(user[11]).decode("utf-8")
+
+    userExpertisesList = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT EssayWriting, TechnicalProposal, OralPresentation, ReaderResponse, Reflection FROM userexpertises WHERE UserID = (%s)',
+        [user[0]])
+
+    userexpertise = []
+    expertiseListIndex = 0
+    for expertise in userExpertisesList:
+        if expertise == 1:
+            userexpertise.append(expertisesList[expertiseListIndex])
+        expertiseListIndex +=1
+
+    userTimeSlotList = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday FROM usertimeslotpreference WHERE UserID = (%s)',
+        [user[0]])
+
+    timeslot = []
+    timeslotindex = 0
+    for usertimeslot in userTimeSlotList:
+        if usertimeslot == 1:
+            timeslot.append(timeSlotList[timeslotindex])
+        timeslotindex += 1
+
+
+    return render_template('profile.html', faculty=faculty, degree=degree, user=user,
+                           profilePic=profilePic, expertisesList=expertisesList, timeSlotList=timeSlotList,
+                           userexpertise=userexpertise, userTimeSlotList=userTimeSlotList,gender=gender,timeslot=timeslot)
+
+@app.route('/updateprofile', methods=['GET', 'POST'])
 def UpdateProfile():
     user = UserInstance.getUser().getDetailsList()
     if request.method == "POST":
@@ -309,7 +349,7 @@ def UpdateProfile():
         formExpertises = request.form.getlist("expertises")
         formTimeSlot = request.form.getlist("timeSlot")
         if formExpertises:
-            DBexpertisesList = ['EssayWriting', 'ReportWriting', 'OralPresentation', 'GrammarCheck', 'SpellingCheck']
+            DBexpertisesList = ['Essay Writing', 'Technical Proposal', 'Oral Presentation', 'Reader Response', 'Reflection']
             if DatabaseInstance.executeSelectOneQuery('SELECT * FROM userexpertises WHERE UserID = {}'.format(user[0])):
                 for i in DBexpertisesList:
                     DatabaseInstance.executeUpdateQuery(
@@ -347,7 +387,7 @@ def UpdateProfile():
         UserInstance.setUser(user)
         return redirect('/profile')
 
-    expertisesList = ['Essay Writing', 'Report Writing', 'Oral Presentation', 'Gammar Check', 'Spelling Check']
+    expertisesList = ['Essay Writing', 'Technical Proposal', 'Oral Presentation', 'Reader Response', 'Reflection']
     timeSlotList = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
     facultyList = DatabaseInstance.executeSelectMultipleQuery('SELECT * FROM faculty ORDER BY FacultyID ASC')
     degreeList = DatabaseInstance.executeSelectMultipleQueryWithParameters(
@@ -357,13 +397,13 @@ def UpdateProfile():
         profilePic = b64encode(user[11]).decode("utf-8")
 
     userExpertisesList = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT EssayWriting, ReportWriting, OralPresentation, GrammarCheck, SpellingCheck FROM userexpertises WHERE UserID = (%s)',
+        'SELECT EssayWriting, TechnicalProposal, OralPresentation, ReaderResponse, Reflection FROM userexpertises WHERE UserID = (%s)',
         [user[0]])
     userTimeSlotList = DatabaseInstance.executeSelectOneQueryWithParameters(
         'SELECT Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday FROM usertimeslotpreference WHERE UserID = (%s)',
         [user[0]])
 
-    return render_template('profile.html', facultyList=facultyList, degreeList=degreeList, user=user,
+    return render_template('update_profile.html', facultyList=facultyList, degreeList=degreeList, user=user,
                            profilePic=profilePic, expertisesList=expertisesList, timeSlotList=timeSlotList,
                            userExpertisesList=userExpertisesList, userTimeSlotList=userTimeSlotList)
 
