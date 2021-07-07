@@ -1,0 +1,38 @@
+{% extends "admin_layout.html" %}
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            All Tutor
+            <table id="example" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Tutor Details</th>
+                        <th>Last name</th>
+                        <th>Date Join</th>
+                        <th>Rating</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in tutorList %}
+                    <tr>
+                        <td>
+                            {% if i[0] %}
+                            <img src="data:;base64,{{ i[0]|picdecode }}" width="25cm" height="25cm">
+                            {% else %}
+                            <img src="..\static\IMG\DefaultProfilePic.png" width="25cm" height="25cm">
+                            {% endif %}
+                            {{i[1]}}
+                        </td>
+                        <td>{{i[2]}}</td>
+                        <td>Date</td>
+                        <td>Rating</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -5,8 +5,8 @@ from scripts import tutor_calendar
 from pyzoom import ZoomClient
 from UserFactory import *
 from datetime import datetime as dt
+from datetime import timedelta
 from base64 import b64encode
-import json
 import os
 
 app = Flask(__name__)
@@ -65,6 +65,7 @@ def login():
             if formEmail == user[0] and formPassword == user[1]:
                 userDetailList = DatabaseInstance.getDetailListOfUser(formEmail)
                 user = UserFactory.createUser(userDetailList)
+                return redirect('/admin')
                 UserInstance.setUser(user)
                 zoomRole = UserInstance.getUser().getZoomRole()
 
@@ -368,16 +369,47 @@ def UpdateProfile():
                            userExpertisesList=userExpertisesList, userTimeSlotList=userTimeSlotList)
 
 
-@app.route('/admin')
-def index(chartID='container', chart_type='line', chart_height=350):
-    chart = {"renderTo": chartID, "type": chart_type, "height": chart_height, }
-    series = [{'name': 'data1', "data": [1, 2, 3]}, {"name": 'data2', "data": [4, 5, 6]}]
-    title = {"{text": 'Today}'}
-    xAxis = {"categories": ['xAxis Data1', 'xAxis Data2']}
-    yAxis = {"title": {"text": 'yAxis Label'}}
-    return render_template('admin_home.html', chartID=chartID, chart=chart, series=series, title=title, xAxis=xAxis,
-                           yAxis=yAxis)
+@app.route('/admin') 
+def admin():
+    pageTitle = "Home"
+    title = "Today's Successful Appointments"
+    subtitle = dt.today().strftime('%d-%b-%Y, %I:%M%p')
+    tmr = dt.today() + timedelta(days=1)
+    total = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) AND (%s)', [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
+    completedApp = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT COUNT(MeetingID) FROM meeting WHERE EndTime BETWEEN (%s) AND (%s)', [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d %H:%M:%S')])
+    avgRating = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT AVG(Rating) FROM meeting WHERE EndTime BETWEEN (%s) AND (%s)', [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d %H:%M:%S')])
+    avgMeetingTime = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT AVG(timestampdiff(MINUTE, StartTime,EndTime)) FROM meeting WHERE StartTime BETWEEN (%s) AND (%s)', [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
+    popularRequest = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT  Topic, COUNT(*) FROM meeting WHERE StartTime BETWEEN (%s) AND (%s)', [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
+    dataHourlyApp = []
+    dataHourlyComApp = []
+    for i in range(0, 24):
+        hourlyApp = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) AND (%s)', [(str(dt.today().strftime('%Y-%m-%d ')) + str(i) + ':00:00'), (str(dt.today().strftime('%Y-%m-%d '))  + str(i) + ':59:59')])
+        HourlyCompletedApp = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT COUNT(MeetingID) FROM meeting WHERE EndTime BETWEEN (%s) AND (%s)', [(str(dt.today().strftime('%Y-%m-%d ')) + str(i) + ':00:00'), (str(dt.today().strftime('%Y-%m-%d '))  + str(i) + ':59:59')])
+        dataHourlyApp.append(hourlyApp[0])
+        dataHourlyComApp.append(HourlyCompletedApp[0])
+    return render_template('admin_home.html', pageTitle=pageTitle, title=title, subtitle=subtitle, total=total[0], completedApp=completedApp[0], avgRating=avgRating[0], avgMeetingTime=avgMeetingTime[0], popularRequest=popularRequest[0], dataHourlyApp=dataHourlyApp, dataHourlyComApp=dataHourlyComApp)
 
+@app.route('/admin/tutormanagment') 
+def tutormanagment():
+    pageTitle = "Tutor Managment"
+    tutorList = DatabaseInstance.executeSelectMultipleQueryWithParameters(
+        'SELECT ProfilePicture, FirstName, LastName FROM user WHERE UserType = (%s) ORDER BY UserID ASC', ['2'])
+    #print( b64encode( tutorList[0][0]).decode("utf-8"))
+    return render_template('admin_tutor_management.html', pageTitle=pageTitle, tutorList=tutorList)
 
+def picDeCode(pic64):
+    if pic64:
+        return b64encode(pic64).decode("utf-8")
+    else:
+        return ""
+
+app.jinja_env.filters['picdecode'] = picDeCode
 if __name__ == '__main__':
     app.run(debug=True)
