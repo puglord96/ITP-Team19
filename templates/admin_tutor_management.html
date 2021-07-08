@@ -12,22 +12,24 @@
                         <th>Last name</th>
                         <th>Date Join</th>
                         <th>Rating</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for i in tutorList %}
                     <tr>
                         <td>
-                            {% if i[0] %}
-                            <img src="data:;base64,{{ i[0]|picdecode }}" width="25cm" height="25cm">
+                            {% if i[1] %}
+                            <img src="data:;base64,{{ i[1]|picdecode }}" width="25cm" height="25cm">
                             {% else %}
                             <img src="..\static\IMG\DefaultProfilePic.png" width="25cm" height="25cm">
                             {% endif %}
-                            {{i[1]}}
+                            {{i[2]}}
                         </td>
-                        <td>{{i[2]}}</td>
-                        <td>Date</td>
-                        <td>Rating</td>
+                        <td>{{i[3]}}</td>
+                        <td>{{i[4]|formatdt}}</td>
+                        <td>{{i[5]}}</td>
+                        <td><a href="{{ url_for('adminTutor', tutorID = i[0]) }}">Edit</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>

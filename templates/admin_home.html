@@ -16,18 +16,6 @@
                         text: 'as of {{subtitle|safe}}'
                     },
 
-                    yAxis: {
-                        title: {
-                            text: ''
-                        }
-                    },
-
-                    xAxis: {
-                        accessibility: {
-                            rangeDescription: 'Starting from 12am to 12pm'
-                        }
-                    },
-
                     legend: {
                         layout: 'vertical',
                         align: 'right',
@@ -39,56 +27,70 @@
                             label: {
                                 connectorAllowed: false
                             },
-                            pointStart: 0
+                            pointStart: 1
                         }
                     },
                     series: [{
-                        name: 'Hourly Appointments',
-                        data: {{dataHourlyApp}}
+                        name: 'Total Appointments',
+                        data: {{ dataTotalApp }}
                     }, {
                         name: 'Completed Appointment',
-                        data: {{dataHourlyComApp}}
+                        data: {{ dataComApp }}
                     }],
 
                     responsive: {
-                        rules: [{
-                            condition: {
-                                maxWidth: 500
-                            },
-                            chartOptions: {
-                                legend: {
-                                    layout: 'horizontal',
-                                    align: 'center',
-                                    verticalAlign: 'bottom'
-                                }
+                    rules: [{
+                        condition: {
+                            maxWidth: 500
+                        },
+                        chartOptions: {
+                            legend: {
+                                layout: 'horizontal',
+                                align: 'center',
+                                verticalAlign: 'bottom'
                             }
-                        }]
-                    }
-
-                });
-
+                        }
+                    }]
+                }
+            });
             </script>
         </div>
-        <div class="col-3">
-            <div class="row">
-                Total Appointments <br>
-                {{total}}
-            </div>
-            <div class="row">
-                Completed Appointments <br>
-                {{completedApp}}
-            </div>
-            <div class="row">
-                Average Rating <br>
-                {{avgRating}}
-            </div>
-            <div class="row">
-                Average Meeting Time <br>
-                {{avgMeetingTime}} Mins
-            </div>
-            <div class="row">
-                Most Popular Request <br>
-                {{popularRequest}}
+        <div class="col-3" style="text-align: center;">
+            <div class="card">
+                <div class="card-header">
+                    Total Appointments <br>
+                    {{total}}
+                </div>
+                <div class="card-header">
+                    Completed Appointments <br>
+                    {{completedApp}}
+                </div>
+                <div class="card-header">
+                    Average Rating <br>
+                    {% if avgRating %}
+                    {{avgRating}}
+                    {% else %}
+                    0
+                    {% endif %}
+                </div>
+                <div class="card-header">
+                    Average Meeting Time <br>
+                    {% if avgMeetingTime %}
+                    {{avgMeetingTime}} Mins
+                    {% else %}
+                    0 Mins
+                    {% endif %}
+
+                </div>
+                <div class="card-header">
+                    Most Popular Request <br>
+                    {{popularRequest}}
+                    {% if popularRequest %}
+                    {{popularRequest}}
+                    {% else %}
+                    None
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>

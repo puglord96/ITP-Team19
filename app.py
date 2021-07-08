@@ -10,6 +10,8 @@ from base64 import b64encode
 import os
 
 app = Flask(__name__)
+#Upload file size limit to 4GB
+app.config['MAX_CONTENT_LENGTH'] = 4086 * 1024 * 1024
 SECRET_KEY = os.urandom(24)
 app.secret_key = SECRET_KEY
 
@@ -244,8 +246,8 @@ def register():
         formDegree = request.form.get('pursuingDegree')
         formGradYear = request.form.get('gradyear')
         DatabaseInstance.executeInsertQueryWithParameters(
-            "INSERT INTO user(email, password, usertype, firstname, lastname, faculty, degree, graduationyear) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
-            [formEmail, formPassword, formUserType, formFirstName, formLastName, formFaculty, formDegree, formGradYear])
+            "INSERT INTO user(email, password, usertype, firstname, lastname, faculty, degree, graduationyear, DateJoin) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+            [formEmail, formPassword, formUserType, formFirstName, formLastName, formFaculty, formDegree, formGradYear, dt.today().strftime('%Y-%m-%d ')])
         return redirect('/')
 
     facultyList = DatabaseInstance.executeSelectMultipleQuery('SELECT * FROM faculty ORDER BY FacultyID ASC')
@@ -429,37 +431,70 @@ def UpdateProfile():
 @app.route('/admin')
 def admin():
     pageTitle = "Home"
-    title = "Today's Successful Appointments"
+    title = "Daily Appointments for past 30 day"
+    subtitle = dt.today().strftime('%d-%b-%Y, %I:%M%p')
+    tmr = dt.today() + timedelta(days=1)
+    total = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s);', [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
+    completedApp = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s) AND Attendance >= 2', [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d %H:%M:%S')])
+    avgRating = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT AVG(Rating) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s) AND Attendance >= 2', [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d %H:%M:%S')])
+    avgMeetingTime = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT AVG(timestampdiff(MINUTE, StartTime,EndTime)) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s) AND Attendance >= 2', [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
+    popularRequest = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT  Topic, COUNT(*) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s)', [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
+    dataTotalApp = []
+    dataComApp = []
+    for i in range(29,-1,-1):
+        totalApp = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL (%s) DAY AND (%s) - INTERVAL (%s) DAY', [dt.today().strftime('%Y-%m-%d '), i, tmr.strftime('%Y-%m-%d '), i])
+        completedApp = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL (%s) DAY AND (%s) - INTERVAL (%s) DAY AND Attendance >= 2', [dt.today().strftime('%Y-%m-%d '), i, tmr.strftime('%Y-%m-%d '), i])
+        dataTotalApp.append(totalApp[0])
+        dataComApp.append(completedApp[0])
+    return render_template('admin_home.html', pageTitle=pageTitle, title=title, subtitle=subtitle, total=total[0], completedApp=completedApp[0], avgRating=avgRating[0], avgMeetingTime=avgMeetingTime[0], popularRequest=popularRequest[0], dataTotalApp=dataTotalApp, dataComApp=dataComApp)
+
+def adminhrsly():
+    pageTitle = "Home"
+    title = "Hourly Successful Appointments for past 24 Hour"
     subtitle = dt.today().strftime('%d-%b-%Y, %I:%M%p')
     tmr = dt.today() + timedelta(days=1)
     total = DatabaseInstance.executeSelectOneQueryWithParameters(
         'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) AND (%s)', [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
     completedApp = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT COUNT(MeetingID) FROM meeting WHERE EndTime BETWEEN (%s) AND (%s)', [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d %H:%M:%S')])
+        'SELECT COUNT(MeetingID) FROM meeting WHERE EndTime BETWEEN (%s) AND (%s)  AND Attendance >= 2', [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d %H:%M:%S')])
     avgRating = DatabaseInstance.executeSelectOneQueryWithParameters(
         'SELECT AVG(Rating) FROM meeting WHERE EndTime BETWEEN (%s) AND (%s)', [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d %H:%M:%S')])
     avgMeetingTime = DatabaseInstance.executeSelectOneQueryWithParameters(
         'SELECT AVG(timestampdiff(MINUTE, StartTime,EndTime)) FROM meeting WHERE StartTime BETWEEN (%s) AND (%s)', [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
     popularRequest = DatabaseInstance.executeSelectOneQueryWithParameters(
         'SELECT  Topic, COUNT(*) FROM meeting WHERE StartTime BETWEEN (%s) AND (%s)', [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
-    dataHourlyApp = []
-    dataHourlyComApp = []
+    dataTotalApp = []
+    dataComApp = []
     for i in range(0, 24):
-        hourlyApp = DatabaseInstance.executeSelectOneQueryWithParameters(
+        totalApp = DatabaseInstance.executeSelectOneQueryWithParameters(
         'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) AND (%s)', [(str(dt.today().strftime('%Y-%m-%d ')) + str(i) + ':00:00'), (str(dt.today().strftime('%Y-%m-%d '))  + str(i) + ':59:59')])
-        HourlyCompletedApp = DatabaseInstance.executeSelectOneQueryWithParameters(
+        completedApp = DatabaseInstance.executeSelectOneQueryWithParameters(
         'SELECT COUNT(MeetingID) FROM meeting WHERE EndTime BETWEEN (%s) AND (%s)', [(str(dt.today().strftime('%Y-%m-%d ')) + str(i) + ':00:00'), (str(dt.today().strftime('%Y-%m-%d '))  + str(i) + ':59:59')])
-        dataHourlyApp.append(hourlyApp[0])
-        dataHourlyComApp.append(HourlyCompletedApp[0])
-    return render_template('admin_home.html', pageTitle=pageTitle, title=title, subtitle=subtitle, total=total[0], completedApp=completedApp[0], avgRating=avgRating[0], avgMeetingTime=avgMeetingTime[0], popularRequest=popularRequest[0], dataHourlyApp=dataHourlyApp, dataHourlyComApp=dataHourlyComApp)
+        dataTotalApp.append(totalApp[0])
+        dataComApp.append(completedApp[0])
+    return render_template('admin_home.html', pageTitle=pageTitle, title=title, subtitle=subtitle, total=total[0], completedApp=completedApp[0], avgRating=avgRating[0], avgMeetingTime=avgMeetingTime[0], popularRequest=popularRequest[0], dataTotalApp=dataTotalApp, dataComApp=dataComApp)
+
 
 @app.route('/admin/tutormanagment')
 def tutormanagment():
     pageTitle = "Tutor Managment"
-    tutorList = DatabaseInstance.executeSelectMultipleQueryWithParameters(
-        'SELECT ProfilePicture, FirstName, LastName FROM user WHERE UserType = (%s) ORDER BY UserID ASC', ['2'])
-    #print( b64encode( tutorList[0][0]).decode("utf-8"))
+    tutorList = DatabaseInstance.executeSelectMultipleQuery(
+        'SELECT UserID, ProfilePicture, FirstName, LastName, DateJoin, AvgRating FROM user AS u LEFT JOIN (SELECT TutorID, AVG(Rating) as AvgRating FROM meeting) AS m ON u.UserID = m.TutorID WHERE u.UserType = (2) ORDER BY u.UserID ASC')
     return render_template('admin_tutor_management.html', pageTitle=pageTitle, tutorList=tutorList)
+
+@app.route('/admin/tutor/<tutorID>')
+def adminTutor(tutorID):
+    pageTitle = "Tutor Managment"
+    userdetail = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT * FROM user WHERE userID = (%s)', [tutorID])
+    return render_template('admin_tutor.html', pageTitle=pageTitle, userdetail=userdetail)
 
 def picDeCode(pic64):
     if pic64:
@@ -467,6 +502,13 @@ def picDeCode(pic64):
     else:
         return ""
 
+def formatdt(date):
+    if date:
+        return date.strftime('%d-%b-%Y')
+    else:
+        return ""
+
+app.jinja_env.filters['formatdt'] = formatdt
 app.jinja_env.filters['picdecode'] = picDeCode
 if __name__ == '__main__':
     app.run(debug=True)
