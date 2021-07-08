@@ -553,8 +553,63 @@ def adminTutor(tutorID):
     pageTitle = "Tutor Managment"
     userdetail = DatabaseInstance.executeSelectOneQueryWithParameters(
         'SELECT * FROM user WHERE userID = (%s)', [tutorID])
-    return render_template('admin_tutor.html', pageTitle=pageTitle, userdetail=userdetail)
+    rating = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT UserID, ProfilePicture, FirstName, LastName, DateJoin, AvgRating FROM user AS u LEFT JOIN (SELECT TutorID, AVG(Rating) as AvgRating FROM meeting) AS m ON u.UserID = m.TutorID WHERE u.UserID = (%s) ORDER BY u.UserID ASC',[tutorID])
+    history = DatabaseInstance.executeSelectMultipleQueryWithParameters(
+        #attendance change to 2 after demo
+        'SELECT * , TIMESTAMPDIFF(MINUTE, StartTime,EndTime) as Duration from meeting WHERE Attendance >= 0 AND TutorID = (%s) ORDER BY meetingID DESC LIMIT 5',[tutorID])
+    historyList = []
+    for i in history:
+        print(i[2])
+        tuteeName = DatabaseInstance.executeSelectOneQueryWithParameters(
+            'SELECT FirstName FROM user WHERE UserID = (%s)',[i[2]])
+        historyList.append((tuteeName[0], i[7], i[11],i[13]))
 
+    faculty = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT name from faculty where FacultyID = (%s)',[userdetail[8]]
+    )
+
+    gender = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT gender from gender where gender_id = (%s)',[userdetail[12]]
+    )
+    
+    return render_template('admin_tutor.html', pageTitle=pageTitle, userdetail=userdetail, rating=rating, historyList=historyList, faculty=faculty[0], gender=gender[0])
+
+@app.route('/admin/tuteemanagment')
+def tuteemanagment():
+    pageTitle = "Tutee Managment"
+    tuteeList = DatabaseInstance.executeSelectMultipleQuery(
+        'SELECT UserID, ProfilePicture, FirstName, LastName, DateJoin, AvgRating FROM user AS u LEFT JOIN (SELECT TutorID, AVG(Rating) as AvgRating FROM meeting) AS m ON u.UserID = m.TutorID WHERE u.UserType = (3) ORDER BY u.UserID ASC')
+    return render_template('admin_tutee_management.html', pageTitle=pageTitle, tuteeList=tuteeList)
+
+
+@app.route('/admin/tutee/<tuteeID>')
+def adminTutee(tuteeID):
+    pageTitle = "Tutee Managment"
+    userdetail = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT * FROM user WHERE userID = (%s)', [tuteeID])
+    rating = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT UserID, ProfilePicture, FirstName, LastName, DateJoin, AvgRating FROM user AS u LEFT JOIN (SELECT TutorID, AVG(Rating) as AvgRating FROM meeting) AS m ON u.UserID = m.TutorID WHERE u.UserID = (%s) ORDER BY u.UserID ASC',[tuteeID])
+    history = DatabaseInstance.executeSelectMultipleQueryWithParameters(
+        #attendance change to 2 after demo
+        'SELECT * , TIMESTAMPDIFF(MINUTE, StartTime,EndTime) as Duration from meeting WHERE Attendance >= 0 AND TuteeID = (%s) ORDER BY meetingID DESC LIMIT 5',[tuteeID])
+    historyList = []
+    print(history)
+    for i in history:
+        print(i[2])
+        tuteeName = DatabaseInstance.executeSelectOneQueryWithParameters(
+            'SELECT FirstName FROM user WHERE UserID = (%s)',[i[2]])
+        historyList.append((tuteeName[0], i[7], i[11],i[13]))
+
+    faculty = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT name from faculty where FacultyID = (%s)',[userdetail[8]]
+    )
+
+    gender = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT gender from gender where gender_id = (%s)',[userdetail[12]]
+    )
+    
+    return render_template('admin_tutee.html', pageTitle=pageTitle, userdetail=userdetail, rating=rating, historyList=historyList, faculty=faculty[0], gender=gender[0])
 
 def picDeCode(pic64):
     if pic64:

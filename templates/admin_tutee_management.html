@@ -8,7 +8,7 @@
             <table id="example" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%">
                 <thead>
                     <tr>
-                        <th>Tutor Details</th>
+                        <th>Tutee Details</th>
                         <th>Last name</th>
                         <th>Date Join</th>
                         <th>Rating</th>
@@ -16,7 +16,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for i in tutorList %}
+                    {% for i in tuteeList %}
                     <tr>
                         <td>
                             {% if i[1] %}
@@ -36,7 +36,7 @@
                             {% else %}
                             <span style="background-color: #FF0000; border-radius: 75%; padding: 5px"> LOW </span>
                             {% endif %}
-                        <td><a href="{{ url_for('adminTutor', tutorID = i[0]) }}">Edit</a></td>
+                        <td><a href="{{ url_for('adminTutee', tuteeID = i[0]) }}">Edit</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>
