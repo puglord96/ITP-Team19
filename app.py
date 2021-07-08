@@ -8,6 +8,8 @@ from datetime import datetime as dt
 from base64 import b64encode
 import json
 import os
+from itertools import chain
+from collections import defaultdict
 
 app = Flask(__name__)
 SECRET_KEY = os.urandom(24)
@@ -95,32 +97,73 @@ def session_booking():
         formGender = request.form.get('gender')
         formRating= request.form.get('rating')
         if not formExpertise:
-            expertiseSearchList = DatabaseInstance.executeSelectMultipleQuery("SELECT DISTINCT u.userid, u.firstname, u.lastname FROM user u, userexpertises e "
-                                                                              "WHERE e.userid = u.userid ")
+            expertiseSearch = DatabaseInstance.executeSelectMultipleQuery("SELECT DISTINCT u.userid, u.firstname, u.lastname FROM user u, userexpertises e "
+                                                                          "WHERE e.userid = u.userid ")
         else:
-            expertiseSearchList = DatabaseInstance.executeSelectMultipleQuery("SELECT DISTINCT u.userid, u.firstname, u.lastname, e."+formExpertise+" FROM user u, userexpertises e "
-                                                                              "WHERE e.userid = u.userid AND e."+formExpertise+" = TRUE ")
+            expertiseSearch = DatabaseInstance.executeSelectMultipleQuery("SELECT DISTINCT u.userid, u.firstname, u.lastname, e."+formExpertise+" FROM user u, userexpertises e "
+                                                                          "WHERE e.userid = u.userid AND e."+formExpertise+" = TRUE ")
         print("===Expetise===")
-        for row in expertiseSearchList:
-            print(row)
+        try:
+            for row in expertiseSearch:
+                expertiseSearchList = [row[0] for row in expertiseSearch]
+            print(expertiseSearchList)
+        except:
+            print("No Matches.")
 
         if not formDiscipline:
-            disciplineSerachList = DatabaseInstance.executeSelectMultipleQuery("SELECT u.userid, u.firstname, u.lastname, d.Name FROM user u, degree d "
-                                                                               "WHERE u.Degree = d.DegreeID ")
+            disciplineSearch = DatabaseInstance.executeSelectMultipleQuery("SELECT u.userid, u.firstname, u.lastname, d.Name FROM user u, degree d "
+                                                                           "WHERE u.Degree = d.DegreeID ")
         else:
-            disciplineSerachList = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.userid, u.firstname, u.lastname, d.Name FROM user u, degree d "
-                                                                              "WHERE u.Degree = d.DegreeID AND d.Name = %s", [formDiscipline])
+            disciplineSearch = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.userid, u.firstname, u.lastname, d.Name FROM user u, degree d "
+                                                                                         "WHERE u.Degree = d.DegreeID AND d.Name = %s", [formDiscipline])
         print("===Discipline===")
-        for row in disciplineSerachList:
-            print(row)
-        # availableTutors = DatabaseInstance.executeSelectMultipleQuery("SELECT FirstName, LastName FROM user WHERE UserType = 2")
-        # tutors = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.firstname, u.lastname, f.tutortuteerating, e.ReaderResponse FROM user u, feedback f, userexpertises e "
-        #                                                                   "WHERE f.tutortuteeid = u.userid AND e.userid = u.userid AND f.tutortuteerating >= %s AND e."+formExpertise+" = 1 ", [formRating])
-        # for row in tutors:
-        #     print(row[])
+        try:
+            for row in disciplineSearch:
+                disciplineSearchList = [row[0] for row in disciplineSearch]
+            print(disciplineSearchList)
+        except:
+            disciplineSearchList =[]
+            print("No Matches.")
 
-    return render_template("session_booking.html", disciplinelist=disciplinelist)
+        if not formGender:
+            genderSearch = DatabaseInstance.executeSelectMultipleQuery("SELECT u.userid, u.firstname, u.lastname FROM user u, gender g "
+                                                                       "WHERE g.gender_id = u.gender ")
+        else:
+            genderSearch = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.userid, u.firstname, u.lastname FROM user u, gender g "
+                                                                                     "WHERE g.gender_id = u.gender AND g.gender = %s ", [formGender])
+        print("===Gender===")
+        try:
+            for row in genderSearch:
+                genderSearchList = [row[0] for row in genderSearch]
+            print(genderSearchList)
+        except:
+            print("No Matches.")
 
+        if not formRating:
+            ratingSearch = DatabaseInstance.executeSelectMultipleQuery("SELECT u.userid, u.firstname, u.lastname FROM user u, feedback f "
+                                                                       "WHERE f.tutortuteeid = u.UserID ")
+        else:
+            ratingSearch = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.userid, u.firstname, u.lastname, AVG(tutortuteerating) AS average FROM user u, feedback f "
+                                                                                     "WHERE f.tutortuteeid = u.UserID GROUP BY u.userid HAVING average >= %s ", [formRating])
+        print("===Rating===")
+        try:
+            for row in ratingSearch:
+                ratingSearchList = [row[0] for row in ratingSearch]
+            print(ratingSearchList)
+        except:
+            ratingSearchList =[]
+            print("No Matches.")
+
+        print("===Ranking===")
+        print (frequency(expertiseSearchList, disciplineSearchList, genderSearchList, ratingSearchList))
+        return render_template("session_booking.html", disciplinelist=disciplinelist)
+
+def frequency(*lists):
+    counter = defaultdict(int)
+    for x in chain(*lists):
+        counter[x] += 1
+    return [key for (key, value) in
+        sorted(counter.items(), key=lambda kv: (kv[1], kv[0]), reverse=True)]
 
 @app.route('/meeting')
 def meeting():
