@@ -101,7 +101,7 @@
                             <select class="form-control" name="Gender" id="Gender">
                                 <option value="NULL" selected>-- Please Select Gender First --</option>
                                 {% for i in genderList %}
-                                {% if i[0] == int(user[12]) %}
+                                {% if i[0] == user[12] %}
                                 <OPTION value={{i[0]}} selected>{{i[1]}}</OPTION>
                                 {% else %}
                                 <OPTION value={{i[0]}}>{{i[1]}}</OPTION>

@@ -10,7 +10,7 @@ from base64 import b64encode
 import os
 
 app = Flask(__name__)
-#Upload file size limit to 4GB
+# Upload file size limit to 4GB
 app.config['MAX_CONTENT_LENGTH'] = 4086 * 1024 * 1024
 SECRET_KEY = os.urandom(24)
 app.secret_key = SECRET_KEY
@@ -38,7 +38,6 @@ def feedback():
 
     meetingid = request.cookies.get("meeting_id")
 
-
     if request.method == "POST":
         feedbacktuteetutor = request.form.get('tutortuteename')
         feedbacksessionrating = request.form.get('sessionrating')
@@ -53,6 +52,7 @@ def feedback():
 
         return redirect('/home')
     return render_template("feedback.html", tutortuteename=tutortuteename)
+
 
 # 1 - Admin
 # 2 - Tutor
@@ -71,7 +71,7 @@ def login():
                 zoomRole = UserInstance.getUser().getZoomRole()
 
                 resp = make_response(redirect('/home'))
-                resp.set_cookie('zoom_role',str(zoomRole))
+                resp.set_cookie('zoom_role', str(zoomRole))
 
                 return resp
     return render_template('login.html')
@@ -109,14 +109,13 @@ def home():
     upcomingmeetingslistquery = UserInstance.getUser().upcomingMeetingsList(userID)
     requestmeetingslistquery = UserInstance.getUser().requestMeetingsList(userID)
 
-
     upcomingmeetingslist = DatabaseInstance.executeSelectMultipleQuery(upcomingmeetingslistquery)
 
     if requestmeetingslistquery is not None:
-        requestmeetingslist = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().requestMeetingsList(userID))
+        requestmeetingslist = DatabaseInstance.executeSelectMultipleQuery(
+            UserInstance.getUser().requestMeetingsList(userID))
     else:
         requestmeetingslist = ""
-
 
     landingswitch = {
         1: render_template(userLandingPage),
@@ -166,13 +165,17 @@ def view_meeting(meetingid):
         userID = UserInstance.getUser().getUserID()
         # prevent injection of URL (make sure that tutor is tutor of the meeting)
         if userID == requestMeeting[0][1] and requestMeeting[0][4] == 1:
-            tutorname = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().getUser(str(requestMeeting[0][1])))
+            tutorname = DatabaseInstance.executeSelectMultipleQuery(
+                UserInstance.getUser().getUser(str(requestMeeting[0][1])))
             tutorname = tutorname[0][0] + " " + tutorname[0][1]
-            tuteename = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().getUser(str(requestMeeting[0][2])))
+            tuteename = DatabaseInstance.executeSelectMultipleQuery(
+                UserInstance.getUser().getUser(str(requestMeeting[0][2])))
             tuteename = tuteename[0][0] + " " + tuteename[0][1]
-            meetingtype = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().getMeetingType(str(requestMeeting[0][3])))
+            meetingtype = DatabaseInstance.executeSelectMultipleQuery(
+                UserInstance.getUser().getMeetingType(str(requestMeeting[0][3])))
             meetingtype = meetingtype[0][0]
-            status = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().getstatustype(str(requestMeeting[0][4])))
+            status = DatabaseInstance.executeSelectMultipleQuery(
+                UserInstance.getUser().getstatustype(str(requestMeeting[0][4])))
             status = status[0][0]
             venue = requestMeeting[0][5]
             attendance = requestMeeting[0][6]
@@ -180,7 +183,8 @@ def view_meeting(meetingid):
             endtime = requestMeeting[0][8]
             topic = requestMeeting[0][12]
             return render_template('view_meeting.html', meetingid=meetingid, tutorname=tutorname, tuteename=tuteename,
-                                   meetingtype=meetingtype, status=status, venue=venue, attendance=attendance, starttime=starttime
+                                   meetingtype=meetingtype, status=status, venue=venue, attendance=attendance,
+                                   starttime=starttime
                                    , endtime=endtime, topic=topic)
     return redirect(url_for('home'))
 
@@ -202,13 +206,17 @@ def view_request(meetingid):
         userID = UserInstance.getUser().getUserID()
         # prevent injection of URL (make sure that tutor is tutor of the meeting)
         if userID == requestMeeting[0][1] and requestMeeting[0][4] == 2:
-            tutorname = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().getUser(str(requestMeeting[0][1])))
+            tutorname = DatabaseInstance.executeSelectMultipleQuery(
+                UserInstance.getUser().getUser(str(requestMeeting[0][1])))
             tutorname = tutorname[0][0] + " " + tutorname[0][1]
-            tuteename = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().getUser(str(requestMeeting[0][2])))
+            tuteename = DatabaseInstance.executeSelectMultipleQuery(
+                UserInstance.getUser().getUser(str(requestMeeting[0][2])))
             tuteename = tuteename[0][0] + " " + tuteename[0][1]
-            meetingtype = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().getMeetingType(str(requestMeeting[0][3])))
+            meetingtype = DatabaseInstance.executeSelectMultipleQuery(
+                UserInstance.getUser().getMeetingType(str(requestMeeting[0][3])))
             meetingtype = meetingtype[0][0]
-            status = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().getstatustype(str(requestMeeting[0][4])))
+            status = DatabaseInstance.executeSelectMultipleQuery(
+                UserInstance.getUser().getstatustype(str(requestMeeting[0][4])))
             status = status[0][0]
             venue = requestMeeting[0][5]
             attendance = requestMeeting[0][6]
@@ -216,7 +224,8 @@ def view_request(meetingid):
             endtime = requestMeeting[0][8]
             topic = requestMeeting[0][12]
             return render_template('view_request.html', meetingid=meetingid, tutorname=tutorname, tuteename=tuteename,
-                                   meetingtype=meetingtype, status=status, venue=venue, attendance=attendance, starttime=starttime
+                                   meetingtype=meetingtype, status=status, venue=venue, attendance=attendance,
+                                   starttime=starttime
                                    , endtime=endtime, topic=topic)
     return redirect(url_for('home'))
 
@@ -247,7 +256,8 @@ def register():
         formGradYear = request.form.get('gradyear')
         DatabaseInstance.executeInsertQueryWithParameters(
             "INSERT INTO user(email, password, usertype, firstname, lastname, faculty, degree, graduationyear, DateJoin) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-            [formEmail, formPassword, formUserType, formFirstName, formLastName, formFaculty, formDegree, formGradYear, dt.today().strftime('%Y-%m-%d ')])
+            [formEmail, formPassword, formUserType, formFirstName, formLastName, formFaculty, formDegree, formGradYear,
+             dt.today().strftime('%Y-%m-%d ')])
         return redirect('/')
 
     facultyList = DatabaseInstance.executeSelectMultipleQuery('SELECT * FROM faculty ORDER BY FacultyID ASC')
@@ -266,18 +276,22 @@ def DegreeByFaculty(Faculty):
         degreeArray.append(degreeOjb)
     return jsonify({'degreeList': degreeArray})
 
+
 @app.route('/profile')
 def profile():
     user = UserInstance.getUser().getDetailsList()
     userRole = UserInstance.getUser().getUserRole()
     landingpage = UserInstance.getUser().getProfileLandingPage()
 
-
     expertisesList = ['Essay Writing', 'Technical Proposal', 'Oral Presentation', 'Reader Response', 'Reflection']
     timeSlotList = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-    gender = DatabaseInstance.executeSelectOneQueryWithParameters('Select gender from gender where gender_id = %s',[user[12]])[0]
-    faculty = DatabaseInstance.executeSelectOneQueryWithParameters('Select name from faculty where facultyid = %s',[user[8]])[0]
-    degree = DatabaseInstance.executeSelectOneQueryWithParameters('SELECT name FROM degree WHERE  DegreeID = %s', [user[9]])[0]
+    gender = \
+    DatabaseInstance.executeSelectOneQueryWithParameters('Select gender from gender where gender_id = %s', [user[12]])[
+        0]
+    faculty = \
+    DatabaseInstance.executeSelectOneQueryWithParameters('Select name from faculty where facultyid = %s', [user[8]])[0]
+    degree = \
+    DatabaseInstance.executeSelectOneQueryWithParameters('SELECT name FROM degree WHERE  DegreeID = %s', [user[9]])[0]
     profilePic = ""
     if user[11]:
         profilePic = b64encode(user[11]).decode("utf-8")
@@ -292,7 +306,7 @@ def profile():
         for expertise in userExpertisesList:
             if expertise == 1:
                 userexpertise.append(expertisesList[expertiseListIndex])
-            expertiseListIndex +=1
+            expertiseListIndex += 1
 
     userTimeSlotList = DatabaseInstance.executeSelectOneQueryWithParameters(
         'SELECT Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday FROM usertimeslotpreference WHERE UserID = (%s)',
@@ -306,19 +320,19 @@ def profile():
                 timeslot.append(timeSlotList[timeslotindex])
             timeslotindex += 1
 
-
-    landingswitch={
-        1:render_template(landingpage, faculty=faculty, degree=degree, user=user,
+    landingswitch = {
+        1: render_template(landingpage, faculty=faculty, degree=degree, user=user,
                            profilePic=profilePic, expertisesList=expertisesList, timeSlotList=timeSlotList,
-                           userexpertise=userexpertise, userTimeSlotList=userTimeSlotList,gender=gender,timeslot=timeslot),
-        2:render_template(landingpage, faculty=faculty, degree=degree, user=user,
+                           userexpertise=userexpertise, userTimeSlotList=userTimeSlotList, gender=gender,
+                           timeslot=timeslot),
+        2: render_template(landingpage, faculty=faculty, degree=degree, user=user,
                            profilePic=profilePic, expertisesList=expertisesList, timeSlotList=timeSlotList,
-                           userexpertise=userexpertise, userTimeSlotList=userTimeSlotList,gender=gender,timeslot=timeslot),
-        3:render_template(landingpage, faculty=faculty, degree=degree, user=user,
-                           profilePic=profilePic,gender=gender)
+                           userexpertise=userexpertise, userTimeSlotList=userTimeSlotList, gender=gender,
+                           timeslot=timeslot),
+        3: render_template(landingpage, faculty=faculty, degree=degree, user=user,
+                           profilePic=profilePic, gender=gender)
     }
     return landingswitch.get(userRole, render_template('error_page.html'))
-
 
 
 @app.route('/updateprofile', methods=['GET', 'POST'])
@@ -339,33 +353,37 @@ def UpdateProfile():
         formFaculty = request.form.get('faculty')
         formDegree = request.form.get('pursuingDegree')
         formGradYear = request.form.get('gradyear')
+        formGender = request.form.get('Gender')
+
+        print(formGender)
         if formPassword:
             if BinaryPicture:
                 DatabaseInstance.executeUpdateQueryWithParameters(
-                    'UPDATE user SET Email = %s, Password = %s, UserType = %s, FirstName = %s, LastName = %s, Alias = %s, MobileNumber = %s, Faculty = %s, Degree = %s, GraduationYear = %s, ProfilePicture = %s WHERE UserID = %s',
+                    'UPDATE user SET Email = %s, Password = %s, UserType = %s, FirstName = %s, LastName = %s, Alias = %s, MobileNumber = %s, Faculty = %s, Degree = %s, GraduationYear = %s, ProfilePicture = %s,gender=%s WHERE UserID = %s',
                     [formEmail, formPassword, formUserType, formFirstName, formLastName, formAlist, formMoblieNumber,
-                     formFaculty, formDegree, formGradYear, BinaryPicture, user[0]])
+                     formFaculty, formDegree, formGradYear, BinaryPicture, formGender, user[0]])
             else:
                 DatabaseInstance.executeUpdateQueryWithParameters(
-                    'UPDATE user SET Email = %s, Password = %s, UserType = %s, FirstName = %s, LastName = %s, Alias = %s, MobileNumber = %s, Faculty = %s, Degree = %s, GraduationYear = %sWHERE UserID = %s',
+                    'UPDATE user SET Email = %s, Password = %s, UserType = %s, FirstName = %s, LastName = %s, Alias = %s, MobileNumber = %s, Faculty = %s, Degree = %s, GraduationYear = %s,gender=%s WHERE UserID = %s',
                     [formEmail, formPassword, formUserType, formFirstName, formLastName, formAlist, formMoblieNumber,
-                     formFaculty, formDegree, formGradYear, user[0]])
+                     formFaculty, formDegree, formGradYear, formGender, user[0]])
         else:
             if BinaryPicture:
                 DatabaseInstance.executeUpdateQueryWithParameters(
-                    'UPDATE user SET Email = %s, UserType = %s, FirstName = %s, LastName = %s, Alias = %s, MobileNumber = %s, Faculty = %s, Degree = %s, GraduationYear = %s, ProfilePicture = %s WHERE UserID = %s',
+                    'UPDATE user SET Email = %s, UserType = %s, FirstName = %s, LastName = %s, Alias = %s, MobileNumber = %s, Faculty = %s, Degree = %s, GraduationYear = %s, ProfilePicture = %s,gender=%s WHERE UserID = %s',
                     [formEmail, formUserType, formFirstName, formLastName, formAlist, formMoblieNumber, formFaculty,
-                     formDegree, formGradYear, BinaryPicture, user[0]])
+                     formDegree, formGradYear, BinaryPicture, formGender, user[0]])
             else:
                 DatabaseInstance.executeUpdateQueryWithParameters(
-                    'UPDATE user SET Email = %s, UserType = %s, FirstName = %s, LastName = %s, Alias = %s, MobileNumber = %s, Faculty = %s, Degree = %s, GraduationYear = %s WHERE UserID = %s',
+                    'UPDATE user SET Email = %s, UserType = %s, FirstName = %s, LastName = %s, Alias = %s, MobileNumber = %s, Faculty = %s, Degree = %s, GraduationYear = %s,gender=%s WHERE UserID = %s',
                     [formEmail, formUserType, formFirstName, formLastName, formAlist, formMoblieNumber, formFaculty,
-                     formDegree, formGradYear, user[0]])
+                     formDegree, formGradYear, formGender, user[0]])
 
         formExpertises = request.form.getlist("expertises")
         formTimeSlot = request.form.getlist("timeSlot")
         if formExpertises:
-            DBexpertisesList = ['Essay Writing', 'Technical Proposal', 'Oral Presentation', 'Reader Response', 'Reflection']
+            DBexpertisesList = ['Essay Writing', 'Technical Proposal', 'Oral Presentation', 'Reader Response',
+                                'Reflection']
             if DatabaseInstance.executeSelectOneQuery('SELECT * FROM userexpertises WHERE UserID = {}'.format(user[0])):
                 for i in DBexpertisesList:
                     DatabaseInstance.executeUpdateQuery(
@@ -422,10 +440,10 @@ def UpdateProfile():
         'SELECT Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday FROM usertimeslotpreference WHERE UserID = (%s)',
         [user[0]])
 
-
     return render_template('update_profile.html', facultyList=facultyList, degreeList=degreeList, user=user,
                            profilePic=profilePic, expertisesList=expertisesList, timeSlotList=timeSlotList,
-                           userExpertisesList=userExpertisesList, userTimeSlotList=userTimeSlotList,genderList = genderList)
+                           userExpertisesList=userExpertisesList, userTimeSlotList=userTimeSlotList,
+                           genderList=genderList)
 
 
 @app.route('/admin')
@@ -435,25 +453,35 @@ def admin():
     subtitle = dt.today().strftime('%d-%b-%Y, %I:%M%p')
     tmr = dt.today() + timedelta(days=1)
     total = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s);', [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
+        'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s);',
+        [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
     completedApp = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s) AND Attendance >= 2', [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d %H:%M:%S')])
+        'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s) AND Attendance >= 2',
+        [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d %H:%M:%S')])
     avgRating = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT AVG(Rating) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s) AND Attendance >= 2', [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d %H:%M:%S')])
+        'SELECT AVG(Rating) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s) AND Attendance >= 2',
+        [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d %H:%M:%S')])
     avgMeetingTime = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT AVG(timestampdiff(MINUTE, StartTime,EndTime)) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s) AND Attendance >= 2', [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
+        'SELECT AVG(timestampdiff(MINUTE, StartTime,EndTime)) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s) AND Attendance >= 2',
+        [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
     popularRequest = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT  Topic, COUNT(*) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s)', [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
+        'SELECT  Topic, COUNT(*) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s)',
+        [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
     dataTotalApp = []
     dataComApp = []
-    for i in range(29,-1,-1):
+    for i in range(29, -1, -1):
         totalApp = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL (%s) DAY AND (%s) - INTERVAL (%s) DAY', [dt.today().strftime('%Y-%m-%d '), i, tmr.strftime('%Y-%m-%d '), i])
+            'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL (%s) DAY AND (%s) - INTERVAL (%s) DAY',
+            [dt.today().strftime('%Y-%m-%d '), i, tmr.strftime('%Y-%m-%d '), i])
         completedApp = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL (%s) DAY AND (%s) - INTERVAL (%s) DAY AND Attendance >= 2', [dt.today().strftime('%Y-%m-%d '), i, tmr.strftime('%Y-%m-%d '), i])
+            'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL (%s) DAY AND (%s) - INTERVAL (%s) DAY AND Attendance >= 2',
+            [dt.today().strftime('%Y-%m-%d '), i, tmr.strftime('%Y-%m-%d '), i])
         dataTotalApp.append(totalApp[0])
         dataComApp.append(completedApp[0])
-    return render_template('admin_home.html', pageTitle=pageTitle, title=title, subtitle=subtitle, total=total[0], completedApp=completedApp[0], avgRating=avgRating[0], avgMeetingTime=avgMeetingTime[0], popularRequest=popularRequest[0], dataTotalApp=dataTotalApp, dataComApp=dataComApp)
+    return render_template('admin_home.html', pageTitle=pageTitle, title=title, subtitle=subtitle, total=total[0],
+                           completedApp=completedApp[0], avgRating=avgRating[0], avgMeetingTime=avgMeetingTime[0],
+                           popularRequest=popularRequest[0], dataTotalApp=dataTotalApp, dataComApp=dataComApp)
+
 
 def adminhrsly():
     pageTitle = "Home"
@@ -461,25 +489,36 @@ def adminhrsly():
     subtitle = dt.today().strftime('%d-%b-%Y, %I:%M%p')
     tmr = dt.today() + timedelta(days=1)
     total = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) AND (%s)', [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
+        'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) AND (%s)',
+        [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
     completedApp = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT COUNT(MeetingID) FROM meeting WHERE EndTime BETWEEN (%s) AND (%s)  AND Attendance >= 2', [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d %H:%M:%S')])
+        'SELECT COUNT(MeetingID) FROM meeting WHERE EndTime BETWEEN (%s) AND (%s)  AND Attendance >= 2',
+        [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d %H:%M:%S')])
     avgRating = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT AVG(Rating) FROM meeting WHERE EndTime BETWEEN (%s) AND (%s)', [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d %H:%M:%S')])
+        'SELECT AVG(Rating) FROM meeting WHERE EndTime BETWEEN (%s) AND (%s)',
+        [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d %H:%M:%S')])
     avgMeetingTime = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT AVG(timestampdiff(MINUTE, StartTime,EndTime)) FROM meeting WHERE StartTime BETWEEN (%s) AND (%s)', [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
+        'SELECT AVG(timestampdiff(MINUTE, StartTime,EndTime)) FROM meeting WHERE StartTime BETWEEN (%s) AND (%s)',
+        [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
     popularRequest = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT  Topic, COUNT(*) FROM meeting WHERE StartTime BETWEEN (%s) AND (%s)', [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
+        'SELECT  Topic, COUNT(*) FROM meeting WHERE StartTime BETWEEN (%s) AND (%s)',
+        [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
     dataTotalApp = []
     dataComApp = []
     for i in range(0, 24):
         totalApp = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) AND (%s)', [(str(dt.today().strftime('%Y-%m-%d ')) + str(i) + ':00:00'), (str(dt.today().strftime('%Y-%m-%d '))  + str(i) + ':59:59')])
+            'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) AND (%s)',
+            [(str(dt.today().strftime('%Y-%m-%d ')) + str(i) + ':00:00'),
+             (str(dt.today().strftime('%Y-%m-%d ')) + str(i) + ':59:59')])
         completedApp = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT COUNT(MeetingID) FROM meeting WHERE EndTime BETWEEN (%s) AND (%s)', [(str(dt.today().strftime('%Y-%m-%d ')) + str(i) + ':00:00'), (str(dt.today().strftime('%Y-%m-%d '))  + str(i) + ':59:59')])
+            'SELECT COUNT(MeetingID) FROM meeting WHERE EndTime BETWEEN (%s) AND (%s)',
+            [(str(dt.today().strftime('%Y-%m-%d ')) + str(i) + ':00:00'),
+             (str(dt.today().strftime('%Y-%m-%d ')) + str(i) + ':59:59')])
         dataTotalApp.append(totalApp[0])
         dataComApp.append(completedApp[0])
-    return render_template('admin_home.html', pageTitle=pageTitle, title=title, subtitle=subtitle, total=total[0], completedApp=completedApp[0], avgRating=avgRating[0], avgMeetingTime=avgMeetingTime[0], popularRequest=popularRequest[0], dataTotalApp=dataTotalApp, dataComApp=dataComApp)
+    return render_template('admin_home.html', pageTitle=pageTitle, title=title, subtitle=subtitle, total=total[0],
+                           completedApp=completedApp[0], avgRating=avgRating[0], avgMeetingTime=avgMeetingTime[0],
+                           popularRequest=popularRequest[0], dataTotalApp=dataTotalApp, dataComApp=dataComApp)
 
 
 @app.route('/admin/tutormanagment')
@@ -489,6 +528,7 @@ def tutormanagment():
         'SELECT UserID, ProfilePicture, FirstName, LastName, DateJoin, AvgRating FROM user AS u LEFT JOIN (SELECT TutorID, AVG(Rating) as AvgRating FROM meeting) AS m ON u.UserID = m.TutorID WHERE u.UserType = (2) ORDER BY u.UserID ASC')
     return render_template('admin_tutor_management.html', pageTitle=pageTitle, tutorList=tutorList)
 
+
 @app.route('/admin/tutor/<tutorID>')
 def adminTutor(tutorID):
     pageTitle = "Tutor Managment"
@@ -496,17 +536,20 @@ def adminTutor(tutorID):
         'SELECT * FROM user WHERE userID = (%s)', [tutorID])
     return render_template('admin_tutor.html', pageTitle=pageTitle, userdetail=userdetail)
 
+
 def picDeCode(pic64):
     if pic64:
         return b64encode(pic64).decode("utf-8")
     else:
         return ""
 
+
 def formatdt(date):
     if date:
         return date.strftime('%d-%b-%Y')
     else:
         return ""
+
 
 app.jinja_env.filters['formatdt'] = formatdt
 app.jinja_env.filters['picdecode'] = picDeCode
