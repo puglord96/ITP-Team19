@@ -86,9 +86,39 @@ def zoom_test():
     return render_template("zoom_meeting_test.html")
 
 
-@app.route('/sessionbooking', methods=['GET', 'POST'])
+@app.route('/sessionbooking', methods=['GET','POST'])
 def session_booking():
     disciplinelist = DatabaseInstance.executeSelectMultipleQuery("Select name from degree")
+    if request.method == "POST":
+        formExpertise = request.form.get('expertise')
+        formDiscipline = request.form.get('discipline')
+        formGender = request.form.get('gender')
+        formRating= request.form.get('rating')
+        if not formExpertise:
+            expertiseSearchList = DatabaseInstance.executeSelectMultipleQuery("SELECT DISTINCT u.userid, u.firstname, u.lastname FROM user u, userexpertises e "
+                                                                              "WHERE e.userid = u.userid ")
+        else:
+            expertiseSearchList = DatabaseInstance.executeSelectMultipleQuery("SELECT DISTINCT u.userid, u.firstname, u.lastname, e."+formExpertise+" FROM user u, userexpertises e "
+                                                                              "WHERE e.userid = u.userid AND e."+formExpertise+" = TRUE ")
+        print("===Expetise===")
+        for row in expertiseSearchList:
+            print(row)
+
+        if not formDiscipline:
+            disciplineSerachList = DatabaseInstance.executeSelectMultipleQuery("SELECT u.userid, u.firstname, u.lastname, d.Name FROM user u, degree d "
+                                                                               "WHERE u.Degree = d.DegreeID ")
+        else:
+            disciplineSerachList = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.userid, u.firstname, u.lastname, d.Name FROM user u, degree d "
+                                                                              "WHERE u.Degree = d.DegreeID AND d.Name = %s", [formDiscipline])
+        print("===Discipline===")
+        for row in disciplineSerachList:
+            print(row)
+        # availableTutors = DatabaseInstance.executeSelectMultipleQuery("SELECT FirstName, LastName FROM user WHERE UserType = 2")
+        # tutors = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.firstname, u.lastname, f.tutortuteerating, e.ReaderResponse FROM user u, feedback f, userexpertises e "
+        #                                                                   "WHERE f.tutortuteeid = u.userid AND e.userid = u.userid AND f.tutortuteerating >= %s AND e."+formExpertise+" = 1 ", [formRating])
+        # for row in tutors:
+        #     print(row[])
+
     return render_template("session_booking.html", disciplinelist=disciplinelist)
 
 
@@ -309,7 +339,7 @@ def UpdateProfile():
         formExpertises = request.form.getlist("expertises")
         formTimeSlot = request.form.getlist("timeSlot")
         if formExpertises:
-            DBexpertisesList = ['EssayWriting', 'ReportWriting', 'OralPresentation', 'GrammarCheck', 'SpellingCheck']
+            DBexpertisesList = ['EssayWriting', 'TechnicalProposal', 'OralPresentation', 'ReaderResponse', 'Reflection']
             if DatabaseInstance.executeSelectOneQuery('SELECT * FROM userexpertises WHERE UserID = {}'.format(user[0])):
                 for i in DBexpertisesList:
                     DatabaseInstance.executeUpdateQuery(
@@ -347,7 +377,7 @@ def UpdateProfile():
         UserInstance.setUser(user)
         return redirect('/profile')
 
-    expertisesList = ['Essay Writing', 'Report Writing', 'Oral Presentation', 'Gammar Check', 'Spelling Check']
+    expertisesList = ['Essay Writing', 'Technical Proposal', 'Oral Presentation', 'Reader Response', 'Reflection']
     timeSlotList = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
     facultyList = DatabaseInstance.executeSelectMultipleQuery('SELECT * FROM faculty ORDER BY FacultyID ASC')
     degreeList = DatabaseInstance.executeSelectMultipleQueryWithParameters(
@@ -357,7 +387,7 @@ def UpdateProfile():
         profilePic = b64encode(user[11]).decode("utf-8")
 
     userExpertisesList = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT EssayWriting, ReportWriting, OralPresentation, GrammarCheck, SpellingCheck FROM userexpertises WHERE UserID = (%s)',
+        'SELECT EssayWriting, TechnicalProposal, OralPresentation, ReaderResponse, Reflection FROM userexpertises WHERE UserID = (%s)',
         [user[0]])
     userTimeSlotList = DatabaseInstance.executeSelectOneQueryWithParameters(
         'SELECT Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday FROM usertimeslotpreference WHERE UserID = (%s)',
