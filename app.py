@@ -76,6 +76,10 @@ def login():
                 return resp
     return render_template('login.html')
 
+@app.route('/logout')
+def logout():
+    UserInstance.removeUser()
+    return redirect('/')
 
 @app.route('/ztest')
 def zoom_test():

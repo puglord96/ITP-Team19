@@ -22,3 +22,6 @@ class UserSingleton:
 
     def getUser(self):
         return self.user
+
+    def removeUser(self):
+        self.user = None
