@@ -201,7 +201,14 @@ def view_meeting(meetingid):
 def view_request(meetingid):
     if request.method == "POST":
         if request.form.get('accept'):
+            update_meeting_info = DatabaseInstance.executeSelectOneQueryWithParameters("select venue,topic from meeting where meetingid=%s",[meetingid])
+            # print(meetingtype)
+            if update_meeting_info[0] == "":
+                meeting = client.meetings.create_meeting(update_meeting_info[1], start_time=dt.now().isoformat(), duration_min=60,
+                                                         password='password')
+                DatabaseInstance.executeUpdateQueryWithParameters("update meeting set venue = %s where meetingid = %s",[meeting.id,meetingid])
             print("accept")
+
             DatabaseInstance.executeUpdateQuery(UserInstance.getUser().acceptRequest(meetingid))
             return redirect('/home')
         elif request.form.get("decline"):
@@ -262,14 +269,16 @@ def register():
         formFaculty = request.form.get('faculty')
         formDegree = request.form.get('pursuingDegree')
         formGradYear = request.form.get('gradyear')
+        formGender = request.form.get('gender')
         DatabaseInstance.executeInsertQueryWithParameters(
-            "INSERT INTO user(email, password, usertype, firstname, lastname, faculty, degree, graduationyear, DateJoin) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-            [formEmail, formPassword, formUserType, formFirstName, formLastName, formFaculty, formDegree, formGradYear,
+            "INSERT INTO user(email, password, usertype, firstname, lastname, faculty, degree, graduationyear,gender,DateJoin) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+            [formEmail, formPassword, formUserType, formFirstName, formLastName, formFaculty, formDegree, formGradYear,formGender,
              dt.today().strftime('%Y-%m-%d ')])
         return redirect('/')
 
     facultyList = DatabaseInstance.executeSelectMultipleQuery('SELECT * FROM faculty ORDER BY FacultyID ASC')
-    return render_template('register.html', facultyList=facultyList)
+    genderList = DatabaseInstance.executeSelectMultipleQuery('select * from gender')
+    return render_template('register.html', facultyList=facultyList,genderList = genderList)
 
 
 @app.route('/register/faculty/<Faculty>')
