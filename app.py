@@ -33,7 +33,9 @@ UserFactory = UserFactory()
 
 @app.route('/feedback', methods=['GET', 'POST'])
 def feedback():
-    tutortuteename = DatabaseInstance.getUserDetails(2)[4] + " " + DatabaseInstance.getUserDetails(2)[5]
+
+    tutortuteenamearray = DatabaseInstance.executeSelectOneQuery(UserInstance.getUser().getFeedbackSubjectNameString(request.cookies.get("meeting_id")))
+    tutortuteename = tutortuteenamearray[0] + " " + tutortuteenamearray[1]
     subjectRole = UserInstance.getUser().feedback_subject_role
 
     meetingid = request.cookies.get("meeting_id")

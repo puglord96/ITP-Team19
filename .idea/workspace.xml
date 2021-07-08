@@ -3,9 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="548e18fe-eee7-4b69-83f9-76b6966b4a12" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserFactory.py" beforeDir="false" afterPath="$PROJECT_DIR$/UserFactory.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/register.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/tutee_home.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/tutee_home.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/tutor_home.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/tutor_home.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -134,7 +134,7 @@
       <workItem from="1625402504597" duration="2208000" />
       <workItem from="1625468629604" duration="17367000" />
       <workItem from="1625642160959" duration="22173000" />
-      <workItem from="1625724617017" duration="10767000" />
+      <workItem from="1625724617017" duration="14458000" />
     </task>
     <servers />
   </component>
@@ -179,6 +179,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="936" height="278" key="GridCell.Tab.0.right/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1625733336235" />
+    <state x="623" y="225" key="search.everywhere.popup" timestamp="1625753480609">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="623" y="225" key="search.everywhere.popup/1920.0.1536.832/0.0.1920.1040@0.0.1920.1040" timestamp="1625753480609" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/ITP_Team19$app.coverage" NAME="app Coverage Results" MODIFIED="1625733336209" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
