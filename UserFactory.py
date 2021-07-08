@@ -91,9 +91,19 @@ class AdminUser(User):
         super().__init__(UserDetails)
         self.landing_page = "admin_home.html"
         self.profile_landing = "tutor_profile.html"
+        self.zoomRole = 1
 
     def getProfileLandingPage(self):
         return self.profile_landing
+
+    def getZoomRole(self):
+        return self.zoomRole
+
+    def upcomingMeetingsList(self, userID):
+        return None
+
+    def requestMeetingsList(self, userID):
+        return None
 
     # Implement other exclusive functions of the Admin here
 

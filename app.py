@@ -109,7 +109,11 @@ def home():
     upcomingmeetingslistquery = UserInstance.getUser().upcomingMeetingsList(userID)
     requestmeetingslistquery = UserInstance.getUser().requestMeetingsList(userID)
 
-    upcomingmeetingslist = DatabaseInstance.executeSelectMultipleQuery(upcomingmeetingslistquery)
+
+    if upcomingmeetingslistquery is not None:
+        upcomingmeetingslist = DatabaseInstance.executeSelectMultipleQuery(upcomingmeetingslistquery)
+    else:
+        upcomingmeetingslist = ""
 
     if requestmeetingslistquery is not None:
         requestmeetingslist = DatabaseInstance.executeSelectMultipleQuery(
