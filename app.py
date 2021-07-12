@@ -47,8 +47,8 @@ def feedback():
         feedbackremarks = request.form.get('remarks')
 
         DatabaseInstance.executeInsertQueryWithParameters(
-            "Insert into feedback(sessionrating,tutortuteerating,remark,tutortuteename,subjectrole) values(%s,%s,%s,%s,%s)",
-            [feedbacksessionrating, feedbacktutortuteerating, feedbackremarks, feedbacktuteetutor, subjectRole])
+            "Insert into feedback(sessionrating,tutortuteerating,remark,tutortuteeid,subjectrole) values(%s,%s,%s,%s,%s)",
+            [feedbacksessionrating, feedbacktutortuteerating, feedbackremarks, tutortuteenamearray[2], subjectRole])
 
         DatabaseInstance.executeUpdateQuery(UserInstance.getUser().updateFeedbackString(meetingid))
 
