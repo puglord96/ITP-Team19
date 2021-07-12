@@ -205,7 +205,7 @@ def view_request(meetingid):
         if request.form.get('accept'):
             update_meeting_info = DatabaseInstance.executeSelectOneQueryWithParameters("select venue,topic from meeting where meetingid=%s",[meetingid])
             # print(meetingtype)
-            if update_meeting_info[0] == "":
+            if update_meeting_info[0] is None or update_meeting_info[0] == "":
                 meeting = client.meetings.create_meeting(update_meeting_info[1], start_time=dt.now().isoformat(), duration_min=60,
                                                          password='password')
                 DatabaseInstance.executeUpdateQueryWithParameters("update meeting set venue = %s where meetingid = %s",[meeting.id,meetingid])
@@ -571,8 +571,8 @@ def adminTutor(tutorID):
     gender = DatabaseInstance.executeSelectOneQueryWithParameters(
         'SELECT gender from gender where gender_id = (%s)',[userdetail[12]]
     )
-    
-    return render_template('admin_tutor.html', pageTitle=pageTitle, userdetail=userdetail, rating=rating[0], historyList=historyList, faculty=faculty[0], gender=gender[0])
+
+    return render_template('admin_tutor.html', pageTitle=pageTitle, userdetail=userdetail, rating=rating, historyList=historyList, faculty=faculty[0], gender=gender[0])
 
 @app.route('/admin/tuteemanagment')
 def tuteemanagment():
@@ -607,7 +607,7 @@ def adminTutee(tuteeID):
     gender = DatabaseInstance.executeSelectOneQueryWithParameters(
         'SELECT gender from gender where gender_id = (%s)',[userdetail[12]]
     )
-    
+
     return render_template('admin_tutee.html', pageTitle=pageTitle, userdetail=userdetail, rating=rating, historyList=historyList, faculty=faculty[0], gender=gender[0])
 
 def picDeCode(pic64):
