@@ -30,11 +30,11 @@
                         <td>{{i[4]|formatdt}}</td>
                         <td>
                             {% if i[5]|int > 6 %}
-                            <span style="background-color: #98ff98; border-radius: 75%; padding: 5px"> HIGH </span>
+                            <button type="button" class="btn btn-success" style="border-radius: 75%; padding: 5px">HIGH</button>
                             {% elif i[5]|int > 4 %}
-                            <span style="background-color: #FFFF00; border-radius: 75%; padding: 5px"> AVG </span>
+                            <button type="button" class="btn btn-warning" style="border-radius: 75%; padding: 5px">AVG</button>
                             {% else %}
-                            <span style="background-color: #FF0000; border-radius: 75%; padding: 5px"> LOW </span>
+                            <button type="button" class="btn btn-danger" style="border-radius: 75%; padding: 5px">LOW</button>
                             {% endif %}
                         <td><a href="{{ url_for('adminTutor', tutorID = i[0]) }}">Edit</a></td>
                     </tr>
