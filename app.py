@@ -4,8 +4,7 @@ from UserSingleton import UserSingleton
 from scripts import tutor_calendar
 from pyzoom import ZoomClient
 from UserFactory import *
-from datetime import datetime as dt
-from datetime import timedelta
+from datetime import datetime as dt,timedelta
 from base64 import b64encode
 import os
 
@@ -31,29 +30,6 @@ UserInstance = UserSingleton().get_instance()
 UserFactory = UserFactory()
 
 
-@app.route('/feedback', methods=['GET', 'POST'])
-def feedback():
-
-    tutortuteenamearray = DatabaseInstance.executeSelectOneQuery(UserInstance.getUser().getFeedbackSubjectNameString(request.cookies.get("meeting_id")))
-    tutortuteename = tutortuteenamearray[0] + " " + tutortuteenamearray[1]
-    subjectRole = UserInstance.getUser().feedback_subject_role
-
-    meetingid = request.cookies.get("meeting_id")
-
-    if request.method == "POST":
-        feedbacktuteetutor = request.form.get('tutortuteename')
-        feedbacksessionrating = request.form.get('sessionrating')
-        feedbacktutortuteerating = request.form.get('tutortuteerating')
-        feedbackremarks = request.form.get('remarks')
-
-        DatabaseInstance.executeInsertQueryWithParameters(
-            "Insert into feedback(sessionrating,tutortuteerating,remark,tutortuteeid,subjectrole) values(%s,%s,%s,%s,%s)",
-            [feedbacksessionrating, feedbacktutortuteerating, feedbackremarks, tutortuteenamearray[2], subjectRole])
-
-        DatabaseInstance.executeUpdateQuery(UserInstance.getUser().updateFeedbackString(meetingid))
-
-        return redirect('/home')
-    return render_template("feedback.html", tutortuteename=tutortuteename)
 
 
 # 1 - Admin
@@ -83,7 +59,7 @@ def logout():
     UserInstance.removeUser()
     return redirect('/')
 
-@app.route('/ztest')
+@app.route('/meetingredirect')
 def zoom_test():
     # Creating a meeting
     # meeting = client.meetings.create_meeting('Test Meeting', start_time=dt.now().isoformat(), duration_min=60,
@@ -102,8 +78,36 @@ def session_booking():
 
 @app.route('/meeting')
 def meeting():
+    global meeting_starttime
+    meeting_starttime = dt.now()
     return render_template("meeting.html")
 
+@app.route('/feedback', methods=['GET', 'POST'])
+def feedback():
+
+    tutortuteenamearray = DatabaseInstance.executeSelectOneQuery(UserInstance.getUser().getFeedbackSubjectNameString(request.cookies.get("meeting_id")))
+    tutortuteename = tutortuteenamearray[0] + " " + tutortuteenamearray[1]
+    subjectRole = UserInstance.getUser().feedback_subject_role
+
+    meetingid = request.cookies.get("meeting_id")
+
+    meetingduration = dt.now() - meeting_starttime
+    print(meetingduration)
+
+    if request.method == "POST":
+        feedbacktuteetutor = request.form.get('tutortuteename')
+        feedbacksessionrating = request.form.get('sessionrating')
+        feedbacktutortuteerating = request.form.get('tutortuteerating')
+        feedbackremarks = request.form.get('remarks')
+
+        DatabaseInstance.executeInsertQueryWithParameters(
+            "Insert into feedback(sessionrating,tutortuteerating,remark,tutortuteeid,subjectrole) values(%s,%s,%s,%s,%s)",
+            [feedbacksessionrating, feedbacktutortuteerating, feedbackremarks, tutortuteenamearray[2], subjectRole])
+
+        DatabaseInstance.executeUpdateQuery(UserInstance.getUser().updateFeedbackString(meetingid))
+
+        return redirect('/home')
+    return render_template("feedback.html", tutortuteename=tutortuteename)
 
 @app.route('/home')
 def home():

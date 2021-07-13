@@ -66,7 +66,7 @@ class TutorUser(User):
         return "update meeting set tutorsurvey = 'done' where meetingid = " + meetingid
 
     def getFeedbackSubjectNameString(self,meetingid):
-        return "select u.firstname,u.lastname,m.tutoruser from user u,meeting m where m.tuteeid = u.userid and m.meetingid = " + meetingid
+        return "select u.firstname,u.lastname,m.tutorid from user u,meeting m where m.tuteeid = u.userid and m.meetingid = " + meetingid
 
     def upcomingMeetingsList(self,userID):
         return "SELECT u.firstname, u.lastname, m.venue,m.starttime,m.endtime,m.topic,m.meetingid,s.description,s.calcolour from user u,meeting m,statustype s where m.tuteeID = u.UserID and s.statusid = m.statusID and m.tutorID = "+str(userID)+"  and m.statusID = 1"
