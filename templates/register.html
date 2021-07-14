@@ -82,6 +82,16 @@
                             <h6>Last Name<span style='color:red;'>*</span></h6>
                             <input type="text" class="form-control" placeholder="Smith" name="lastName">
                         </div>
+                    <div class="col">
+
+                        <h6>Gender<span style='color:red;'>*</span></h6>
+                            <select class="form-control" name="gender" id="gender">
+                                <option value="NULL" selected="">-- Please Select --</option>
+                                {% for i in genderList %}
+                                <OPTION value={{i[0]}}>{{i[1]}}</OPTION>
+                                {% endfor %}
+                            </select>
+                    </div>
                     </div>
                     <div class="row" style="padding-top: 20px;">
                         <div class="col">

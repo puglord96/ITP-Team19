@@ -54,6 +54,7 @@
 
                     </div>#}
             <script>
+                var today = new Date();
                 let calendarEl = document.getElementById('calendar');
                 let calendar = new FullCalendar.Calendar(calendarEl, {
                     contentHeight:550,
@@ -87,7 +88,7 @@
                             "Status: " + IdStatusArray[1]+ "<br>"+
                         "</p>";
 
-                        if (IdStatusArray[1] === "Accepted"){
+                        if (IdStatusArray[1] === "Accepted" && info.event.start.getTime()<=today.getTime()){
                             document.getElementById("zoom_button").innerHTML=
                                 " <a href='{{ url_for('zoom_test') }}' class='btn btn-primary'>Go to Meeting</a>";
                         } else{

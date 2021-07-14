@@ -2,63 +2,116 @@
 <html>
 
 <head>
-  <!--    <link rel="shortcut icon" href="../static/img/favicon.ico" type="image/x-icon">-->
-  <link rel="icon" href="../static/img/favicon.ico" type="image/x-icon">
-  <!-- Required meta tags -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <!--    <link rel="shortcut icon" href="../static/img/favicon.ico" type="image/x-icon">-->
+    <link rel="icon" href="../static/img/favicon.ico" type="image/x-icon">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="../static/code/highcharts.js"></script>
+    <script src="../static/code/modules/data.js"></script>
+    <script src="../static/code/modules/series-label.js"></script>
+    <script src="../static/code/modules/exporting.js"></script>
+    <script src="../static/code/modules/export-data.js"></script>
 
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="http://code.highcharts.com/maps/modules/map.js"></script>
 
-  {% if title %}
-  <title>Communication Helpdesk - {{ title }}</title>
-  {% else %}
-  <title>Communication Helpdesk</title>
-  {% endif %}
+    <!-- Additional files for the Highslide popup effect -->
+    <script src="https://www.highcharts.com/media/com_demo/js/highslide-full.min.js"></script>
+    <script src="https://www.highcharts.com/media/com_demo/js/highslide.config.js" charset="utf-8"></script>
+    <link rel="stylesheet" type="text/css" href="https://www.highcharts.com/media/com_demo/css/highslide.css" />
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+
+    {% if title %}
+    <title>Communication Helpdesk - {{ title }}</title>
+    {% else %}
+    <title>Communication Helpdesk</title>
+    {% endif %}
 </head>
 
 <body>
-  <header class="site-header">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-steel fixed-top">
+    <header class="site-header">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-steel fixed-top">
 
-      <a class="navbar-brand mr-4" href="/">Communication Helpdesk</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle"
-        aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarToggle">
-        <div class="navbar-nav mr-auto">
-          <a class="nav-item nav-link" href="{{ url_for('home') }}">Home</a>
+            <a class="navbar-brand mr-4" href="{{ url_for('home') }}">Communication Helpdesk</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle"
+                aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarToggle">
+                <div class="navbar-nav mr-auto">
+                    <a class="nav-item nav-link" href="{{ url_for('home') }}">Home</a>
+                    <a class="nav-item nav-link" href="{{ url_for('UpdateProfile') }}">Profile</a>
 
+                </div>
+
+                <!-- Navbar Right Side -->
+                <div class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                </div>
+            </div>
+
+        </nav>
+    </header>
+    <main role="main" class="container-fluid">
+        <div class="row">
+            <div class="col-4" style='text-align: right;'>
+                <h1>Administration Panel</h1>
+            </div>
+            <div class="col-8">
+                <h4>{{pageTitle}}</h4>
+            </div>
         </div>
-        <!-- Navbar Right Side -->
-        <div class="navbar-nav">
-
+        <div class="row">
+            <div class="col-1">
+            </div>
+            <div class="col-2">
+                <div class="card">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <button type="Analytics" class="btn btn-light"><a
+                                    href="{{ url_for('admin') }}">Analytics</a></button>
+                        </li>
+                        <li class="list-group-item">
+                            <button type="Analytics" class="btn btn-light"><a
+                                    href="{{ url_for('tutormanagment') }}">Tutor Management</a></button>
+                        </li>
+                        <li class="list-group-item">
+                            <button type="Analytics" class="btn btn-light"><a
+                                    href="{{ url_for('tuteemanagment') }}">Tutee Management</a></button>
+                        </li>
+                        <li class="list-group-item">
+                            <button type="Analytics" class="btn btn-light"><a
+                                    href="{{ url_for('tutormanagment') }}">Appointment (WIP)</a></button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-9">
+                {% block content %}{% endblock %}
+            </div>
         </div>
-      </div>
 
-    </nav>
-  </header>
-  <main role="main" class="container-fluid">
-    {% block content %}{% endblock %}
-  </main>
+    </main>
 
 
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
 
-  <!-- Optional JavaScript -->
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-    crossorigin="anonymous"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-    crossorigin="anonymous"></script>
 </body>
 
 </html>
