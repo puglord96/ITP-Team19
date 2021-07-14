@@ -1,0 +1,43 @@
+{% extends "admin_layout.html" %}
+{% block content %}
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <div class='container-fluid' id="calendar"></div>
+                <div id="meeting"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var today = new Date();
+        let calendarEl = document.getElementById('calendar');
+        let calendar = new FullCalendar.Calendar(calendarEl, {
+            contentHeight:550,
+             events: [
+                         {% for meeting in meetinglist %}
+                            {
+                                id:['{{meeting}}'],
+                                start : '{{ meeting[3] }}',
+                                display:'block',
+                                color:'blue',
+                                textColor:'Blue'
+                            },
+                        {% endfor %}
+                    ],
+            eventClick: function(info){
+                <!-- prevent default prevents redirecting to the URL-->
+                info.jsEvent.preventDefault();
+                 document.getElementById("meeting").innerHTML=
+                     info.event.id;
+
+            }
+        });
+        calendar.render();
+
+
+
+
+    </script>
+{% endblock content %}

@@ -88,6 +88,7 @@ def feedback():
     tutortuteenamearray = DatabaseInstance.executeSelectOneQuery(UserInstance.getUser().getFeedbackSubjectNameString(request.cookies.get("meeting_id")))
     tutortuteename = tutortuteenamearray[0] + " " + tutortuteenamearray[1]
     subjectRole = UserInstance.getUser().feedback_subject_role
+    userRole = UserInstance.getUser().getUserRole()
 
     meetingid = request.cookies.get("meeting_id")
 
@@ -99,6 +100,9 @@ def feedback():
         feedbacksessionrating = request.form.get('sessionrating')
         feedbacktutortuteerating = request.form.get('tutortuteerating')
         feedbackremarks = request.form.get('remarks')
+
+        if userRole == 2:
+            DatabaseInstance.executeUpdateQueryWithParameters("update meeting set meetingtimeelapsed = %s where meetingid = %s",[meetingduration,meetingid])
 
         DatabaseInstance.executeInsertQueryWithParameters(
             "Insert into feedback(sessionrating,tutortuteerating,remark,tutortuteeid,subjectrole) values(%s,%s,%s,%s,%s)",
@@ -550,6 +554,35 @@ def tutormanagment():
     tutorList = DatabaseInstance.executeSelectMultipleQuery(
         'SELECT UserID, ProfilePicture, FirstName, LastName, DateJoin, MAX(AvgRating) FROM user AS u LEFT JOIN (SELECT TutorID, feedbackid, Attendance FROM meeting) AS m ON u.UserID = m.TutorID LEFT JOIN (SELECT feedbackid, AVG(sessionrating) AS AvgRating FROM feedback) AS fb ON m.feedbackid = fb.feedbackid WHERE u.UserType = (2) GROUP BY u.UserID ORDER BY u.UserID ASC;')
     return render_template('admin_tutor_management.html', pageTitle=pageTitle, tutorList=tutorList)
+
+@app.route('/admin/appointmentmanagement')
+def appointmentmanagement():
+    meetinglist = []
+    meetingslistquery = DatabaseInstance.executeSelectMultipleQuery("Select tutorid,tuteeid,topic,starttime,meetingtypeID,venue,tutorsurvey,tuteesurvey,statusid from meeting")
+
+    for meetings in meetingslistquery:
+        meetingsarray = []
+        print(meetings[0])
+
+        tutorname = DatabaseInstance.executeSelectOneQueryWithParameters("select concat(firstname,' ',lastname) from user where userid = %s", str(meetings[0]))[0]
+        tuteename = DatabaseInstance.executeSelectOneQueryWithParameters("select concat(firstname,' ',lastname) from user where userid = %s", str(meetings[1]))[0]
+        meetingtype = DatabaseInstance.executeSelectOneQueryWithParameters("select description from meetingtype where meetingtypeid = %s", str(meetings[4]))[0]
+        meetingstatus = DatabaseInstance.executeSelectOneQueryWithParameters("select description from statustype where statusid = %s", str(meetings[8]))[0]
+
+        meetingsarray.append(tutorname)
+        meetingsarray.append(tuteename)
+        meetingsarray.append(meetings[2])
+        meetingsarray.append(meetings[3])
+        meetingsarray.append(meetingtype)
+        meetingsarray.append(meetings[5])
+        meetingsarray.append(meetings[6])
+        meetingsarray.append(meetings[7])
+        meetingsarray.append(meetingstatus)
+
+        meetinglist.append(meetingsarray)
+
+    print(meetinglist)
+    return render_template('admin_appointments.html',meetinglist = meetinglist)
 
 
 @app.route('/admin/tutor/<tutorID>')
