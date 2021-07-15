@@ -5,21 +5,44 @@
         <div class="row">
             <div class="col">
                 <div class='container-fluid' id="calendar"></div>
-                <div id="meeting"></div>
+                <br>
+                <div class='container-fluid'>
+                    <h5 id="meetingdate"></h5>
+                    <table id="example" class="table table-striped table-bordered dt-responsive nowrap" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Meeting ID</th>
+                        <th>Tutor Name</th>
+                        <th>Tutee Name</th>
+                        <th>Session Date and Time</th>
+                        <th>Session Type</th>
+                        <th>Venue</th>
+                        <th>Tutor Survey</th>
+                        <th>Tutee Survey</th>
+                        <th>Meeting Status</th>
+                    </tr>
+                </thead>
+                <tbody id="meetingtable">
+
+                </tbody>
+            </table>
+                </div>
+
             </div>
         </div>
     </div>
 
     <script>
+
         var today = new Date();
         let calendarEl = document.getElementById('calendar');
         let calendar = new FullCalendar.Calendar(calendarEl, {
-            contentHeight:550,
+            contentHeight:700,
              events: [
-                         {% for meeting in meetinglist %}
+                         {% for date,value in meetingsdict.items() %}
                             {
-                                id:['{{meeting}}'],
-                                start : '{{ meeting[3] }}',
+                                id:'{{value}}',
+                                start : '{{ date }}',
                                 display:'block',
                                 color:'blue',
                                 textColor:'Blue'
@@ -29,8 +52,54 @@
             eventClick: function(info){
                 <!-- prevent default prevents redirecting to the URL-->
                 info.jsEvent.preventDefault();
-                 document.getElementById("meeting").innerHTML=
-                     info.event.id;
+
+
+
+                var list = info.event.id.replaceAll("&#39;","").split(',');
+
+                var tablestring="";
+
+                for(var i = 0;i < list.length;i++){
+
+
+                    var tutorname = list[0].replace(/[^\w\s]/gi,"");
+                    var date = new Date(list[3].replace("datetime.datetime(",""),list[4]-1,list[5],list[6],list[7].replace(")",""));
+
+
+                    if(i%14 === 1){
+                        tablestring += "<td>";
+                        tablestring += list[i];
+                        tablestring += "</td>";
+                    } else if(i%14===4){
+                        var date = new Date(list[i].replace("datetime.datetime(",""),list[i+1]-1,list[i+2],list[i+3],list[i+4].replace(")","")).toDateString();
+                        tablestring += "<td>";
+                         tablestring += date;
+                         tablestring += "</td>";
+                    } else if(i%14 === 13){
+                        tablestring += "<td>";
+                         tablestring += list[i].replace(/[^\w\s]/gi,"");
+                         tablestring += "</td></tr>";
+                    } else if((i%14 > 8 && i%14 < 14)||i%14===2){
+                         tablestring += "<td>";
+                         tablestring += list[i];
+                         tablestring += "</td>";
+                    } else if(i%14===0){
+                         var meetingid = list[i].replace(/[^\w\s]/gi,"");
+                        tablestring += "<tr><td id='"+meetingid+"'>";
+                        tablestring += meetingid;
+                        tablestring += "</td>";
+                    }
+
+
+                }
+
+
+
+                document.getElementById("meetingdate").innerHTML= "All meetings on " + info.event.start.toDateString();
+                document.getElementById("meetingtable").innerHTML= tablestring;
+
+
+
 
             }
         });
