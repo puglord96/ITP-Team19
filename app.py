@@ -8,7 +8,7 @@ from datetime import datetime as dt,timedelta
 from base64 import b64encode
 import os
 from itertools import chain
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 app = Flask(__name__)
 # Upload file size limit to 4GB
@@ -75,6 +75,7 @@ def zoom_test():
 @app.route('/sessionbooking', methods=['GET','POST'])
 def session_booking():
     disciplinelist = DatabaseInstance.executeSelectMultipleQuery("Select name from degree")
+    tutorTable = []
     if request.method == "POST":
         formExpertise = request.form.get('expertise')
         formDiscipline = request.form.get('discipline')
@@ -125,7 +126,7 @@ def session_booking():
 
         if not formRating:
             ratingSearch = DatabaseInstance.executeSelectMultipleQuery("SELECT u.userid, u.firstname, u.lastname FROM user u, feedback f "
-                                                                       "WHERE f.tutortuteeid = u.UserID ")
+                                                                       "WHERE f.tutortuteeid = u.UserID GROUP BY u.userid")
         else:
             ratingSearch = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.userid, u.firstname, u.lastname, AVG(tutortuteerating) AS average FROM user u, feedback f "
                                                                                      "WHERE f.tutortuteeid = u.UserID GROUP BY u.userid HAVING average >= %s ", [formRating])
@@ -139,8 +140,21 @@ def session_booking():
             print("No Matches.")
 
         print("===Ranking===")
-        print (frequency(expertiseSearchList, disciplineSearchList, genderSearchList, ratingSearchList))
-        return render_template("session_booking.html", disciplinelist=disciplinelist)
+        # rankingList = frequency(expertiseSearchList, disciplineSearchList, genderSearchList, ratingSearchList)
+        # print(rankingList)
+        # print(Counter(rankingList))
+        rankingList = [expertiseSearchList, disciplineSearchList, genderSearchList, ratingSearchList]
+        frequencyList = frequency(expertiseSearchList, disciplineSearchList, genderSearchList, ratingSearchList)
+        print(frequencyList)
+        occurences = Counter(x for xs in rankingList for x in set(xs))
+        for tutorID in frequencyList:
+            tutorQuery = DatabaseInstance.executeSelectOneQueryWithParameters('SELECT UserID, ProfilePicture, FirstName, LastName, MAX(AvgRating) FROM user AS u LEFT JOIN (SELECT TutorID, feedbackid, Attendance FROM meeting) AS m ON u.UserID = m.TutorID LEFT JOIN (SELECT feedbackid, AVG(sessionrating) AS AvgRating FROM feedback) AS fb ON m.feedbackid = fb.feedbackid WHERE u.UserType = (2) AND u.UserID = %s GROUP BY u.UserID;', [tutorID])
+            tutorTable.append(tutorQuery)
+            percentage = int(occurences[tutorID] / 5 * 100)
+            # tutorTable.append(percentage)
+        print(tutorTable)
+        return render_template("session_booking_results.html", disciplinelist=disciplinelist, tutorTable=tutorTable)
+    return render_template("session_booking.html", disciplinelist=disciplinelist)
 
 def frequency(*lists):
     counter = defaultdict(int)
@@ -148,6 +162,19 @@ def frequency(*lists):
         counter[x] += 1
     return [key for (key, value) in
         sorted(counter.items(), key=lambda kv: (kv[1], kv[0]), reverse=True)]
+
+@app.route('/tutorBooking/<tutorID>', methods=['GET','POST'])
+def tutorBooking(tutorID):
+    pageTitle = "Tutor Booking"
+    userdetail = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT * FROM user WHERE userID = (%s)', [tutorID])
+    faculty = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT name from faculty where FacultyID = (%s)',[userdetail[8]]
+    )
+    gender = DatabaseInstance.executeSelectOneQueryWithParameters(
+        'SELECT gender from gender where gender_id = (%s)',[userdetail[12]]
+    )
+    return render_template("tutor_booking.html", pageTitle=pageTitle, userdetail=userdetail, faculty=faculty[0], gender=gender[0])
 
 @app.route('/meeting')
 def meeting():

@@ -1,0 +1,25 @@
+{% extends "tutee_layout.html" %}
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col">
+      Booking
+        <table class="table table-striped table-bordered dt-responsive nowrap" style="width:100%">
+            <td>Tutor Details</td>
+            <tr>
+                <td>Name:</td>
+                <td>{{userdetail[4]}} {{userdetail[5]}}</td>
+            </tr>
+            <tr>
+                <td>Faculty:</td>
+                <td>{{faculty}}</td>
+            </tr>
+            <tr>
+                <td>Gender:</td>
+                <td>{{gender}}</td>
+            </tr>
+        </table>
+      </div>
+    </div>
+</div>
+{% endblock content %}

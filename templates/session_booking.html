@@ -40,7 +40,7 @@
                                 <label for="rating">Rating</label>
                                 <select class="form-control form-control-small" name="rating" id="rating">
                                     <option selected></option>
-                                    {% for rating in range(6) %}
+                                    {% for rating in range(11) %}
                                     <option value="{{ rating }}">{{ rating }}</option>
                                     {% endfor %}
                                 </select>
@@ -51,44 +51,8 @@
                         </form>
                     </div>
                 </div>
-
-            <div class="card">
-                    <div class="card-header bg-bluetheme">
-                        Available Sessions
-                    </div>
-                    <div class="card-body">
-
-
-                    <a href="#">View all available sessions</a>
-                    <div class='container-fluid' id="sessioncalendar"></div>
-                </div>
-
-
-
-                </div>
-
-            <script>
-                    let calendarEl = document.getElementById('sessioncalendar');
-                    let calendar = new FullCalendar.Calendar(calendarEl, {
-                    events: [
-                        {% for calendar_upcoming in calendar_upcomings %}
-                        {
-                        title : '{{ calendar_upcoming.todo }}',
-                        start : '{{ calendar_upcoming.date }}',
-                        url: '{{ calendar_upcoming.zoom_link }}'
-                        },
-                        {% endfor %}
-                    ],
-                        eventClick: function(info){
-                        <!-- prevent default prevents redirecting to the URL-->
-                            info.jsEvent.preventDefault();
-                            alert('Event: ' + info.event.title);
-                            alert('Start: ' + info.event.start);
-                            alert('Zoom Link: ' + info.event.url);
-                    }
-                    });
-                    calendar.render();
-                    </script>
+                    {% block table %}
+                    {% endblock %}
             </div>
         </div>
 
