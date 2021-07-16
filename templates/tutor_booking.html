@@ -21,5 +21,23 @@
         </table>
       </div>
     </div>
+    <form method="post">
+      <div class="row">
+        <div class="col-md-5" style="width: 50%">
+        <div class="btn-group col-xs-12" data-toggle="buttons">
+        {% for i in timeslots %}
+        {% if i is not none %}
+        <label class="btn btn-primary form-check-label">
+          <input class="form-check-input" name="timeslot" value="{{i}}" type="radio" style="display:none">{{i}}</input>
+        </label>
+        {% endif %}
+        {% endfor %}
+        </div>
+        </div>
+      </div>
+      <div class="row">
+        <input class="btn btn-info" name="submit_button" type="submit" value="Submit">
+      </div>
+    </form>
 </div>
 {% endblock content %}

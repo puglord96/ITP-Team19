@@ -4,11 +4,12 @@ from UserSingleton import UserSingleton
 from scripts import tutor_calendar
 from pyzoom import ZoomClient
 from UserFactory import *
-from datetime import datetime as dt,timedelta
-from base64 import b64encode
-import os
+from datetime import datetime as dt, timedelta
 from itertools import chain
 from collections import defaultdict, Counter
+from datetime import datetime, timedelta
+from base64 import b64encode
+import os
 
 app = Flask(__name__)
 # Upload file size limit to 4GB
@@ -125,11 +126,18 @@ def session_booking():
             print("No Matches.")
 
         if not formRating:
-            ratingSearch = DatabaseInstance.executeSelectMultipleQuery("SELECT u.userid, u.firstname, u.lastname FROM user u, feedback f "
-                                                                       "WHERE f.tutortuteeid = u.UserID GROUP BY u.userid")
+            # ratingSearch = DatabaseInstance.executeSelectMultipleQuery("SELECT u.userid, u.firstname, u.lastname FROM user u, feedback f "
+            #                                                            "WHERE f.tutortuteeid = u.UserID GROUP BY u.userid")
+            ratingSearch = DatabaseInstance.executeSelectMultipleQuery("SELECT UserID, FirstName, LastName FROM user AS u "
+                                                                       "LEFT JOIN (SELECT TutorID, feedbackid FROM meeting) AS m ON u.UserID = m.TutorID "
+                                                                       "LEFT JOIN (SELECT feedbackid, sessionrating AS AvgRating FROM feedback) AS fb ON m.feedbackid = fb.feedbackid "
+                                                                       "WHERE u.UserType = (2) GROUP BY u.UserID ORDER BY u.UserID ASC;")
+
         else:
-            ratingSearch = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.userid, u.firstname, u.lastname, AVG(tutortuteerating) AS average FROM user u, feedback f "
-                                                                                     "WHERE f.tutortuteeid = u.UserID GROUP BY u.userid HAVING average >= %s ", [formRating])
+            # ratingSearch = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.userid, u.firstname, u.lastname, AVG(tutortuteerating) AS average FROM user u, feedback f "
+            #                                                                          "WHERE f.tutortuteeid = u.UserID GROUP BY u.userid HAVING average >= %s ", [formRating])
+            ratingSearch = DatabaseInstance.executeSelectMultipleQueryWithParameters(
+                'SELECT UserID, FirstName, LastName, MAX(AvgRating) FROM user AS u LEFT JOIN (SELECT TutorID, feedbackid FROM meeting) AS m ON u.UserID = m.TutorID LEFT JOIN (SELECT feedbackid, AVG(sessionrating) AS AvgRating FROM feedback) AS fb ON m.feedbackid = fb.feedbackid WHERE u.UserType = (2) GROUP BY u.UserID HAVING AvgRating >= %s ORDER BY u.UserID ASC;', [formRating])
         print("===Rating===")
         try:
             for row in ratingSearch:
@@ -152,7 +160,7 @@ def session_booking():
             tutorTable.append(tutorQuery)
             percentage = int(occurences[tutorID] / 5 * 100)
             # tutorTable.append(percentage)
-        print(tutorTable)
+        # print(tutorTable)
         return render_template("session_booking_results.html", disciplinelist=disciplinelist, tutorTable=tutorTable)
     return render_template("session_booking.html", disciplinelist=disciplinelist)
 
@@ -165,16 +173,55 @@ def frequency(*lists):
 
 @app.route('/tutorBooking/<tutorID>', methods=['GET','POST'])
 def tutorBooking(tutorID):
+    if request.method == 'POST':
+        userID = UserInstance.getUser().getUserID()
+        formTimeSlot = request.form.get('timeslot')
+        formStartTime, formEndTime = formTimeSlot.split(' - ', 1)
+        StartTime = datetime.strptime(formStartTime,'%H:%M').time()
+        EndTime = datetime.strptime(formEndTime,'%H:%M').time()
+        formatStart = dt.combine(dt.today(), StartTime)
+        formatEnd = dt.combine(dt.today(), EndTime)
+        print("%s %s"% (formatStart,formatEnd))
+        DatabaseInstance.executeInsertQueryWithParameters(
+            "INSERT INTO meeting (tutorID, tuteeID, meetingtypeID, statusID, StartTime, EndTime) VALUES (%s,%s,2,2,%s,%s)",
+            [tutorID, userID, formatStart, formatEnd])
+        # Sample Inser Statement
+        # INSERT INTO `meeting` VALUES (1,2,3,1,1,'88600763699','2','2021-07-07 00:10:00','2021-07-07 01:00:00','',NULL,10,'Report','00:00:00')
+
     pageTitle = "Tutor Booking"
     userdetail = DatabaseInstance.executeSelectOneQueryWithParameters(
         'SELECT * FROM user WHERE userID = (%s)', [tutorID])
     faculty = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT name from faculty where FacultyID = (%s)',[userdetail[8]]
+        'SELECT name from faculty where FacultyID = (%s)', [userdetail[8]]
     )
     gender = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT gender from gender where gender_id = (%s)',[userdetail[12]]
+        'SELECT gender from gender where gender_id = (%s)', [userdetail[12]]
     )
-    return render_template("tutor_booking.html", pageTitle=pageTitle, userdetail=userdetail, faculty=faculty[0], gender=gender[0])
+    appointments = DatabaseInstance.executeSelectMultipleQueryWithParameters(
+        'SELECT StartTime, EndTime FROM meeting WHERE tutorID = (%s)', [tutorID]
+    )
+    sortedAppointments = sorted(appointments, key=lambda x: x[1])
+    # datetime(2021, 7, 7, 10)
+    # ‘year’, ‘month’, ‘date’, ‘hour’
+    timeslots = get_slots(hours, sortedAppointments)
+    return render_template("tutor_booking.html", pageTitle=pageTitle, userdetail=userdetail, faculty=faculty[0], gender=gender[0], timeslots = timeslots)
+    # appointments sample input
+    # appointments = [(datetime(2012, 5, 22, 10), datetime(2012, 5, 22, 10, 30)),
+    #                 (datetime(2012, 5, 22, 12), datetime(2012, 5, 22, 13)),
+    #                 (datetime(2012, 5, 22, 15, 30), datetime(2012, 5, 22, 17, 10))]
+
+hours = (datetime(2021, 7, 7, 9, 0), datetime(2021, 7, 7, 18, 0))
+
+def get_slots(hours, appointments, duration=timedelta(hours=0.5)):
+    slots = sorted([(hours[0], hours[0])] + appointments + [(hours[1], hours[1])])
+    slot = []
+    for start, end in ((slots[i][1], slots[i+1][0]) for i in range(len(slots)-1)):
+        assert start <= end, "Cannot attend all appointments"
+        while start + duration <= end and len(slot) < 12:
+            slot.append("{:%H:%M} - {:%H:%M}".format(start, start + duration))
+            start += duration
+            # print(slot)
+    return slot
 
 @app.route('/meeting')
 def meeting():
