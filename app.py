@@ -42,7 +42,7 @@ def login():
     if request.method == "POST":
         formEmail = request.form.get('email')
         formPassword = request.form.get('password')
-        
+
         for user in userlist:
             if formEmail == user[0] and formPassword == user[1]:
                 userDetailList = DatabaseInstance.getDetailListOfUser(formEmail)
@@ -66,7 +66,7 @@ def logout():
     return redirect('/')
 
 @app.route('/meetingredirect')
-def zoom_test():
+def meeting_redirect():
     # Creating a meeting
     # meeting = client.meetings.create_meeting('Test Meeting', start_time=dt.now().isoformat(), duration_min=60,
     #                                          password='password')
@@ -114,7 +114,7 @@ def feedback():
             "Insert into feedback(sessionrating,tutortuteerating,remark,tutortuteeid,subjectrole) values(%s,%s,%s,%s,%s)",
             [feedbacksessionrating, feedbacktutortuteerating, feedbackremarks, tutortuteenamearray[2], subjectRole])
 
-        DatabaseInstance.executeUpdateQuery(UserInstance.getUser().updateFeedbackString(meetingid))
+        DatabaseInstance.executeUpdateQuery(UserInstance.getUser().getUpdateFeedbackString(meetingid))
 
         return redirect('/home')
     return render_template("feedback.html", tutortuteename=tutortuteename)
@@ -126,8 +126,8 @@ def home():
     userRole = UserInstance.getUser().getUserRole()
     userName = UserInstance.getUser().getUserName()
     userLandingPage = UserInstance.getUser().landing_page
-    upcomingmeetingslistquery = UserInstance.getUser().upcomingMeetingsList(userID)
-    requestmeetingslistquery = UserInstance.getUser().requestMeetingsList(userID)
+    upcomingmeetingslistquery = UserInstance.getUser().getUpcomingMeetingsList(userID)
+    requestmeetingslistquery = UserInstance.getUser().getMeetingsRequestList(userID)
 
 
     if upcomingmeetingslistquery is not None:
@@ -137,10 +137,10 @@ def home():
 
     if requestmeetingslistquery is not None:
         requestmeetingslist = DatabaseInstance.executeSelectMultipleQuery(
-            UserInstance.getUser().requestMeetingsList(userID))
+            UserInstance.getUser().getMeetingsRequestList(userID))
     else:
         requestmeetingslist = ""
-    
+
     if userRole == 1:
         pageTitle = "Home"
         title = "Daily Appointments for past 30 day"
@@ -222,7 +222,7 @@ def view_meeting(meetingid):
     #         return redirect('/home')
     userRole = UserInstance.getUser().getUserRole()
     if userRole == 2:
-        requestMeeting = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().requestMeeting(meetingid))
+        requestMeeting = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().getMeetingDetailsString(meetingid))
         userID = UserInstance.getUser().getUserID()
         # prevent injection of URL (make sure that tutor is tutor of the meeting)
         if userID == requestMeeting[0][1] and requestMeeting[0][4] == 1:
@@ -262,7 +262,7 @@ def view_request(meetingid):
                 DatabaseInstance.executeUpdateQueryWithParameters("update meeting set venue = %s where meetingid = %s",[meeting.id,meetingid])
             print("accept")
 
-            DatabaseInstance.executeUpdateQuery(UserInstance.getUser().acceptRequest(meetingid))
+            DatabaseInstance.executeUpdateQuery(UserInstance.getUser().acceptMeetingRequest(meetingid))
             return redirect('/home')
         elif request.form.get("decline"):
             print("decline")
@@ -270,7 +270,7 @@ def view_request(meetingid):
             return redirect('/home')
     userRole = UserInstance.getUser().getUserRole()
     if userRole == 2:
-        requestMeeting = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().requestMeeting(meetingid))
+        requestMeeting = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().getMeetingDetailsString(meetingid))
         userID = UserInstance.getUser().getUserID()
         # prevent injection of URL (make sure that tutor is tutor of the meeting)
         if userID == requestMeeting[0][1] and requestMeeting[0][4] == 2:
@@ -335,7 +335,7 @@ def register():
 
 
 @app.route('/register/faculty/<Faculty>')
-def DegreeByFaculty(Faculty):
+def degree_by_faculty(Faculty):
     degreeList = DatabaseInstance.executeSelectMultipleQueryWithParameters(
         'SELECT * FROM degree WHERE FacultyID = (%s) ORDER BY DegreeID ASC', [Faculty])
     degreeArray = []
@@ -406,7 +406,7 @@ def profile():
 
 
 @app.route('/updateprofile', methods=['GET', 'POST'])
-def UpdateProfile():
+def update_profile():
     user = UserInstance.getUser().getDetailsList()
     if request.method == "POST":
         BinaryPicture = ""
@@ -636,7 +636,7 @@ def appointmentmanagement():
 
         print(meetingsdict)
         return render_template('admin_appointments.html',meetingsdict=meetingsdict)
-        
+
     else:
         return redirect(url_for('home'))
 
@@ -716,7 +716,7 @@ def adminTutee(tuteeID):
     else:
         return redirect(url_for('home'))
 
-def picDeCode(pic64):
+def decode_pic(pic64):
     if pic64:
         return b64encode(pic64).decode("utf-8")
     else:
@@ -729,6 +729,6 @@ def formatdt(date):
         return ""
 
 app.jinja_env.filters['formatdt'] = formatdt
-app.jinja_env.filters['picdecode'] = picDeCode
+app.jinja_env.filters['picdecode'] = decode_pic
 if __name__ == '__main__':
     app.run(debug=True)
