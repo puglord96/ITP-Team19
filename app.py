@@ -41,9 +41,11 @@ UserFactory = UserFactory()
 @app.route('/', methods=['GET', 'POST'])
 def login():
     userlist = DatabaseInstance.executeSelectMultipleQuery("Select email,password from user")
+    loginmsg = ""
     if request.method == "POST":
         formEmail = request.form.get('email')
         formPassword = request.form.get('password')
+
         for user in userlist:
             if formEmail == user[0] and formPassword == user[1]:
                 userDetailList = DatabaseInstance.getDetailListOfUser(formEmail)
@@ -55,7 +57,11 @@ def login():
                 resp.set_cookie('zoom_role', str(zoomRole))
 
                 return resp
-    return render_template('login.html')
+        loginmsg = "Please enter a vaild Username and Password."
+        print(loginmsg)
+    print("outside")
+    print(loginmsg)
+    return render_template('login.html', loginmsg=loginmsg)
 
 @app.route('/logout')
 def logout():
@@ -63,7 +69,7 @@ def logout():
     return redirect('/')
 
 @app.route('/meetingredirect')
-def zoom_test():
+def meeting_redirect():
     # Creating a meeting
     # meeting = client.meetings.create_meeting('Test Meeting', start_time=dt.now().isoformat(), duration_min=60,
     #                                          password='password')
@@ -255,7 +261,7 @@ def feedback():
             "Insert into feedback(sessionrating,tutortuteerating,remark,tutortuteeid,subjectrole) values(%s,%s,%s,%s,%s)",
             [feedbacksessionrating, feedbacktutortuteerating, feedbackremarks, tutortuteenamearray[2], subjectRole])
 
-        DatabaseInstance.executeUpdateQuery(UserInstance.getUser().updateFeedbackString(meetingid))
+        DatabaseInstance.executeUpdateQuery(UserInstance.getUser().getUpdateFeedbackString(meetingid))
 
         return redirect('/home')
     return render_template("feedback.html", tutortuteename=tutortuteename)
@@ -267,8 +273,8 @@ def home():
     userRole = UserInstance.getUser().getUserRole()
     userName = UserInstance.getUser().getUserName()
     userLandingPage = UserInstance.getUser().landing_page
-    upcomingmeetingslistquery = UserInstance.getUser().upcomingMeetingsList(userID)
-    requestmeetingslistquery = UserInstance.getUser().requestMeetingsList(userID)
+    upcomingmeetingslistquery = UserInstance.getUser().getUpcomingMeetingsList(userID)
+    requestmeetingslistquery = UserInstance.getUser().getMeetingsRequestList(userID)
 
 
     if upcomingmeetingslistquery is not None:
@@ -278,12 +284,49 @@ def home():
 
     if requestmeetingslistquery is not None:
         requestmeetingslist = DatabaseInstance.executeSelectMultipleQuery(
-            UserInstance.getUser().requestMeetingsList(userID))
+            UserInstance.getUser().getMeetingsRequestList(userID))
     else:
         requestmeetingslist = ""
 
+    if userRole == 1:
+        pageTitle = "Home"
+        title = "Daily Appointments for past 30 day"
+        subtitle = dt.today().strftime('%d-%b-%Y, %I:%M%p')
+        tmr = dt.today() + timedelta(days=1)
+        total = DatabaseInstance.executeSelectOneQueryWithParameters(
+            'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s);',
+            [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d')])
+        completedApp = DatabaseInstance.executeSelectOneQueryWithParameters(
+            'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s) AND Attendance >= 2',
+            [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d %H:%M:%S')])
+        avgRating = DatabaseInstance.executeSelectOneQueryWithParameters(
+            'SELECT AVG(Rating) FROM meeting as m LEFT JOIN (SELECT feedbackid, sessionrating as Rating FROM feedback) as fb ON m.feedbackid = fb.feedbackid WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s) AND Attendance >= 0',
+            [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d %H:%M:%S')])
+        avgMeetingTime = DatabaseInstance.executeSelectOneQueryWithParameters(
+            'SELECT AVG(timestampdiff(MINUTE, StartTime,EndTime)) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s) AND Attendance >= 2',
+            [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d')])
+        popularRequest = DatabaseInstance.executeSelectOneQueryWithParameters(
+            'SELECT  Topic, COUNT(*) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s)',
+            [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d')])
+        dataTotalApp = []
+        dataComApp = []
+        for i in range(29, -1, -1):
+            dailyTotalApp = DatabaseInstance.executeSelectOneQueryWithParameters(
+                'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL (%s) DAY AND (%s) - INTERVAL (%s) DAY',
+                [dt.today().strftime('%Y-%m-%d '), i, tmr.strftime('%Y-%m-%d '), i])
+            dailyCompletedApp = DatabaseInstance.executeSelectOneQueryWithParameters(
+                'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL (%s) DAY AND (%s) - INTERVAL (%s) DAY AND Attendance >= 2',
+                [dt.today().strftime('%Y-%m-%d '), i, tmr.strftime('%Y-%m-%d '), i])
+            dataTotalApp.append(dailyTotalApp[0])
+            dataComApp.append(dailyCompletedApp[0])
+    else:
+        pageTitle = title = subtitle = dataTotalApp = dataComApp = ""
+        total = completedApp = avgRating = avgMeetingTime = popularRequest = [""]
+
     landingswitch = {
-        1: render_template(userLandingPage),
+        1: render_template(userLandingPage, pageTitle=pageTitle, title=title, subtitle=subtitle, total=total[0],
+                           completedApp=completedApp[0], avgRating=avgRating[0], avgMeetingTime=avgMeetingTime[0],
+                           popularRequest=popularRequest[0], dataTotalApp=dataTotalApp, dataComApp=dataComApp),
         3: render_template(userLandingPage, calendar_upcomings=upcomingmeetingslist),
         2: render_template(userLandingPage, calendar_requests=requestmeetingslist,
                            calendar_upcomings=upcomingmeetingslist)
@@ -326,7 +369,7 @@ def view_meeting(meetingid):
     #         return redirect('/home')
     userRole = UserInstance.getUser().getUserRole()
     if userRole == 2:
-        requestMeeting = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().requestMeeting(meetingid))
+        requestMeeting = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().getMeetingDetailsString(meetingid))
         userID = UserInstance.getUser().getUserID()
         # prevent injection of URL (make sure that tutor is tutor of the meeting)
         if userID == requestMeeting[0][1] and requestMeeting[0][4] == 1:
@@ -366,7 +409,7 @@ def view_request(meetingid):
                 DatabaseInstance.executeUpdateQueryWithParameters("update meeting set venue = %s where meetingid = %s",[meeting.id,meetingid])
             print("accept")
 
-            DatabaseInstance.executeUpdateQuery(UserInstance.getUser().acceptRequest(meetingid))
+            DatabaseInstance.executeUpdateQuery(UserInstance.getUser().acceptMeetingRequest(meetingid))
             return redirect('/home')
         elif request.form.get("decline"):
             print("decline")
@@ -374,7 +417,7 @@ def view_request(meetingid):
             return redirect('/home')
     userRole = UserInstance.getUser().getUserRole()
     if userRole == 2:
-        requestMeeting = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().requestMeeting(meetingid))
+        requestMeeting = DatabaseInstance.executeSelectMultipleQuery(UserInstance.getUser().getMeetingDetailsString(meetingid))
         userID = UserInstance.getUser().getUserID()
         # prevent injection of URL (make sure that tutor is tutor of the meeting)
         if userID == requestMeeting[0][1] and requestMeeting[0][4] == 2:
@@ -439,7 +482,7 @@ def register():
 
 
 @app.route('/register/faculty/<Faculty>')
-def DegreeByFaculty(Faculty):
+def degree_by_faculty(Faculty):
     degreeList = DatabaseInstance.executeSelectMultipleQueryWithParameters(
         'SELECT * FROM degree WHERE FacultyID = (%s) ORDER BY DegreeID ASC', [Faculty])
     degreeArray = []
@@ -510,7 +553,7 @@ def profile():
 
 
 @app.route('/updateprofile', methods=['GET', 'POST'])
-def UpdateProfile():
+def update_profile():
     user = UserInstance.getUser().getDetailsList()
     if request.method == "POST":
         BinaryPicture = ""
@@ -619,7 +662,6 @@ def UpdateProfile():
                            genderList=genderList)
 
 
-@app.route('/admin')
 def admin():
     pageTitle = "Home"
     title = "Daily Appointments for past 30 day"
@@ -627,7 +669,7 @@ def admin():
     tmr = dt.today() + timedelta(days=1)
     total = DatabaseInstance.executeSelectOneQueryWithParameters(
         'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s);',
-        [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
+        [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d')])
     completedApp = DatabaseInstance.executeSelectOneQueryWithParameters(
         'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s) AND Attendance >= 2',
         [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d %H:%M:%S')])
@@ -636,21 +678,21 @@ def admin():
         [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d %H:%M:%S')])
     avgMeetingTime = DatabaseInstance.executeSelectOneQueryWithParameters(
         'SELECT AVG(timestampdiff(MINUTE, StartTime,EndTime)) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s) AND Attendance >= 2',
-        [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
+        [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d')])
     popularRequest = DatabaseInstance.executeSelectOneQueryWithParameters(
         'SELECT  Topic, COUNT(*) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL 30 DAY AND (%s)',
-        [dt.today().strftime('%Y-%m-%d'), tmr.strftime('%Y-%m-%d')])
+        [dt.today().strftime('%Y-%m-%d'), dt.today().strftime('%Y-%m-%d')])
     dataTotalApp = []
     dataComApp = []
     for i in range(29, -1, -1):
-        totalApp = DatabaseInstance.executeSelectOneQueryWithParameters(
+        dailyTotalApp = DatabaseInstance.executeSelectOneQueryWithParameters(
             'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL (%s) DAY AND (%s) - INTERVAL (%s) DAY',
             [dt.today().strftime('%Y-%m-%d '), i, tmr.strftime('%Y-%m-%d '), i])
-        completedApp = DatabaseInstance.executeSelectOneQueryWithParameters(
+        dailyCompletedApp = DatabaseInstance.executeSelectOneQueryWithParameters(
             'SELECT COUNT(MeetingID) FROM meeting WHERE StartTime BETWEEN (%s) - INTERVAL (%s) DAY AND (%s) - INTERVAL (%s) DAY AND Attendance >= 2',
             [dt.today().strftime('%Y-%m-%d '), i, tmr.strftime('%Y-%m-%d '), i])
-        dataTotalApp.append(totalApp[0])
-        dataComApp.append(completedApp[0])
+        dataTotalApp.append(dailyTotalApp[0])
+        dataComApp.append(dailyCompletedApp[0])
     return render_template('admin_home.html', pageTitle=pageTitle, title=title, subtitle=subtitle, total=total[0],
                            completedApp=completedApp[0], avgRating=avgRating[0], avgMeetingTime=avgMeetingTime[0],
                            popularRequest=popularRequest[0], dataTotalApp=dataTotalApp, dataComApp=dataComApp)
@@ -696,47 +738,53 @@ def adminhrsly():
 
 @app.route('/admin/tutormanagment')
 def tutormanagment():
-    pageTitle = "Tutor Managment"
-    tutorList = DatabaseInstance.executeSelectMultipleQuery(
-        'SELECT UserID, ProfilePicture, FirstName, LastName, DateJoin, MAX(AvgRating) FROM user AS u LEFT JOIN (SELECT TutorID, feedbackid, Attendance FROM meeting) AS m ON u.UserID = m.TutorID LEFT JOIN (SELECT feedbackid, AVG(sessionrating) AS AvgRating FROM feedback) AS fb ON m.feedbackid = fb.feedbackid WHERE u.UserType = (2) GROUP BY u.UserID ORDER BY u.UserID ASC;')
-    return render_template('admin_tutor_management.html', pageTitle=pageTitle, tutorList=tutorList)
-
+    userRole = UserInstance.getUser().getUserRole()
+    if userRole == 1:
+        pageTitle = "Tutor Managment"
+        tutorList = DatabaseInstance.executeSelectMultipleQuery(
+            'SELECT UserID, ProfilePicture, FirstName, LastName, DateJoin, MAX(AvgRating) FROM user AS u LEFT JOIN (SELECT TutorID, feedbackid, Attendance FROM meeting) AS m ON u.UserID = m.TutorID LEFT JOIN (SELECT feedbackid, AVG(sessionrating) AS AvgRating FROM feedback) AS fb ON m.feedbackid = fb.feedbackid WHERE u.UserType = (2) GROUP BY u.UserID ORDER BY u.UserID ASC;')
+        return render_template('admin_tutor_management.html', pageTitle=pageTitle, tutorList=tutorList)
+    else:
+        return redirect(url_for('home'))
 
 
 @app.route('/admin/appointmentmanagement')
 def appointmentmanagement():
-    meetingsdict = {}
-    meetingslistquery = DatabaseInstance.executeSelectMultipleQuery("Select meetingid,tutorid,tuteeid,topic,starttime,meetingtypeID,venue,tutorsurvey,tuteesurvey,statusid from meeting")
+    userRole = UserInstance.getUser().getUserRole()
+    if userRole == 1:
+        meetingsdict = {}
+        meetingslistquery = DatabaseInstance.executeSelectMultipleQuery("Select meetingid,tutorid,tuteeid,topic,starttime,meetingtypeID,venue,tutorsurvey,tuteesurvey,statusid from meeting")
 
-    for meetings in meetingslistquery:
-        meetingsarray = []
+        for meetings in meetingslistquery:
+            meetingsarray = []
 
-        meetingdate = meetings[4].date()
-        tutorname = DatabaseInstance.executeSelectOneQueryWithParameters("select concat(firstname,' ',lastname) from user where userid = %s", str(meetings[1]))[0]
-        tuteename = DatabaseInstance.executeSelectOneQueryWithParameters("select concat(firstname,' ',lastname) from user where userid = %s", str(meetings[2]))[0]
-        meetingtype = DatabaseInstance.executeSelectOneQueryWithParameters("select description from meetingtype where meetingtypeid = %s", str(meetings[5]))[0]
-        meetingstatus = DatabaseInstance.executeSelectOneQueryWithParameters("select description from statustype where statusid = %s", str(meetings[9]))[0]
+            meetingdate = meetings[4].date()
+            tutorname = DatabaseInstance.executeSelectOneQueryWithParameters("select concat(firstname,' ',lastname) from user where userid = %s", str(meetings[1]))[0]
+            tuteename = DatabaseInstance.executeSelectOneQueryWithParameters("select concat(firstname,' ',lastname) from user where userid = %s", str(meetings[2]))[0]
+            meetingtype = DatabaseInstance.executeSelectOneQueryWithParameters("select description from meetingtype where meetingtypeid = %s", str(meetings[5]))[0]
+            meetingstatus = DatabaseInstance.executeSelectOneQueryWithParameters("select description from statustype where statusid = %s", str(meetings[9]))[0]
 
-        meetingsarray.append(meetings[0])
-        meetingsarray.append(tutorname)
-        meetingsarray.append(tuteename)
-        meetingsarray.append(meetings[3])
-        meetingsarray.append(meetings[4])
-        meetingsarray.append(meetingtype)
-        meetingsarray.append(meetings[6])
-        meetingsarray.append(meetings[7])
-        meetingsarray.append(meetings[8])
-        meetingsarray.append(meetingstatus)
+            meetingsarray.append(meetings[0])
+            meetingsarray.append(tutorname)
+            meetingsarray.append(tuteename)
+            meetingsarray.append(meetings[3])
+            meetingsarray.append(meetings[4])
+            meetingsarray.append(meetingtype)
+            meetingsarray.append(meetings[6])
+            meetingsarray.append(meetings[7])
+            meetingsarray.append(meetings[8])
+            meetingsarray.append(meetingstatus)
 
-        if meetingdate not in meetingsdict:
-            meetingsdict[meetingdate] = []
+            if meetingdate not in meetingsdict:
+                meetingsdict[meetingdate] = []
 
-        meetingsdict[meetingdate].append(meetingsarray)
+            meetingsdict[meetingdate].append(meetingsarray)
 
+        print(meetingsdict)
+        return render_template('admin_appointments.html',meetingsdict=meetingsdict)
 
-
-    print(meetingsdict)
-    return render_template('admin_appointments.html',meetingsdict=meetingsdict)
+    else:
+        return redirect(url_for('home'))
 
 
 
@@ -744,72 +792,81 @@ def appointmentmanagement():
 
 @app.route('/admin/tutor/<tutorID>')
 def adminTutor(tutorID):
-    pageTitle = "Tutor Managment"
-    userdetail = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT * FROM user WHERE userID = (%s)', [tutorID])
-    rating = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT MAX(AvgRating) FROM user AS u LEFT JOIN (SELECT TutorID, feedbackid, Attendance FROM meeting) AS m ON u.UserID = m.TutorID LEFT JOIN (SELECT feedbackid, AVG(sessionrating) AS AvgRating FROM feedback) AS fb ON m.feedbackid = fb.feedbackid WHERE u.UserID = (%s) ORDER BY u.UserID ASC',[tutorID])
-    history = DatabaseInstance.executeSelectMultipleQueryWithParameters(
-        #attendance change to 2 after demo
-        'SELECT * , TIMESTAMPDIFF(MINUTE, StartTime,EndTime) as Duration from meeting WHERE Attendance >= 0 AND TutorID = (%s) ORDER BY meetingID DESC LIMIT 5',[tutorID])
-    historyList = []
-    for i in history:
-        tuteeName = DatabaseInstance.executeSelectOneQueryWithParameters(
-            'SELECT FirstName FROM user WHERE UserID = (%s)',[i[2]])
-        historyList.append((tuteeName[0], i[7], i[11],i[13]))
+    userRole = UserInstance.getUser().getUserRole()
+    if userRole == 1:
+        pageTitle = "Tutor Managment"
+        userdetail = DatabaseInstance.executeSelectOneQueryWithParameters(
+            'SELECT * FROM user WHERE userID = (%s)', [tutorID])
+        rating = DatabaseInstance.executeSelectOneQueryWithParameters(
+            'SELECT MAX(AvgRating) FROM user AS u LEFT JOIN (SELECT TutorID, feedbackid, Attendance FROM meeting) AS m ON u.UserID = m.TutorID LEFT JOIN (SELECT feedbackid, AVG(sessionrating) AS AvgRating FROM feedback) AS fb ON m.feedbackid = fb.feedbackid WHERE u.UserID = (%s) ORDER BY u.UserID ASC',[tutorID])
+        history = DatabaseInstance.executeSelectMultipleQueryWithParameters(
+            #attendance change to 2 after demo
+            'SELECT * , TIMESTAMPDIFF(MINUTE, StartTime,EndTime) as Duration from meeting WHERE Attendance >= 0 AND TutorID = (%s) ORDER BY meetingID DESC LIMIT 5',[tutorID])
+        historyList = []
+        for i in history:
+            tuteeName = DatabaseInstance.executeSelectOneQueryWithParameters(
+                'SELECT FirstName FROM user WHERE UserID = (%s)',[i[2]])
+            historyList.append((tuteeName[0], i[7], i[11],i[13]))
 
-    faculty = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT name from faculty where FacultyID = (%s)',[userdetail[8]]
-    )
+        faculty = DatabaseInstance.executeSelectOneQueryWithParameters(
+            'SELECT name from faculty where FacultyID = (%s)',[userdetail[8]]
+        )
 
-    gender = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT gender from gender where gender_id = (%s)',[userdetail[12]]
-    )
-
-    return render_template('admin_tutor.html', pageTitle=pageTitle, userdetail=userdetail, rating=rating, historyList=historyList, faculty=faculty[0], gender=gender[0])
+        gender = DatabaseInstance.executeSelectOneQueryWithParameters(
+            'SELECT gender from gender where gender_id = (%s)',[userdetail[12]]
+        )
+        return render_template('admin_tutor.html', pageTitle=pageTitle, userdetail=userdetail, rating=rating, historyList=historyList, faculty=faculty[0], gender=gender[0])
+    else:
+        return redirect(url_for('home'))
 
 @app.route('/admin/tuteemanagment')
 def tuteemanagment():
-    pageTitle = "Tutee Managment"
-    tuteeList = DatabaseInstance.executeSelectMultipleQuery(
-        'SELECT UserID, ProfilePicture, FirstName, LastName, DateJoin, MAX(AvgRating) FROM user AS u LEFT JOIN (SELECT TuteeID, feedbackid, Attendance FROM meeting) AS m ON u.UserID = m.TuteeID LEFT JOIN (SELECT feedbackid, AVG(sessionrating) AS AvgRating FROM feedback) AS fb ON m.feedbackid = fb.feedbackid WHERE u.UserType = (3) GROUP BY u.UserID ORDER BY u.UserID ASC')
-    return render_template('admin_tutee_management.html', pageTitle=pageTitle, tuteeList=tuteeList)
+    userRole = UserInstance.getUser().getUserRole()
+    if userRole == 1:
+        pageTitle = "Tutee Managment"
+        tuteeList = DatabaseInstance.executeSelectMultipleQuery(
+            'SELECT UserID, ProfilePicture, FirstName, LastName, DateJoin, MAX(AvgRating) FROM user AS u LEFT JOIN (SELECT TuteeID, feedbackid, Attendance FROM meeting) AS m ON u.UserID = m.TuteeID LEFT JOIN (SELECT feedbackid, AVG(sessionrating) AS AvgRating FROM feedback) AS fb ON m.feedbackid = fb.feedbackid WHERE u.UserType = (3) GROUP BY u.UserID ORDER BY u.UserID ASC')
+        return render_template('admin_tutee_management.html', pageTitle=pageTitle, tuteeList=tuteeList)
+    else:
+        return redirect(url_for('home'))
 
 
 @app.route('/admin/tutee/<tuteeID>')
 def adminTutee(tuteeID):
-    pageTitle = "Tutee Managment"
-    userdetail = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT * FROM user WHERE userID = (%s)', [tuteeID])
-    rating = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT MAX(AvgRating) FROM user AS u LEFT JOIN (SELECT TutorID, feedbackid, Attendance FROM meeting) AS m ON u.UserID = m.TutorID LEFT JOIN (SELECT feedbackid, AVG(sessionrating) AS AvgRating FROM feedback) AS fb ON m.feedbackid = fb.feedbackid WHERE u.UserID = (%s) ORDER BY u.UserID ASC',[tuteeID])
-    history = DatabaseInstance.executeSelectMultipleQueryWithParameters(
-        #attendance change to 2 after demo
-        'SELECT * , TIMESTAMPDIFF(MINUTE, StartTime,EndTime) as Duration from meeting WHERE Attendance >= 0 AND TuteeID = (%s) ORDER BY meetingID DESC LIMIT 5',[tuteeID])
-    historyList = []
-    print(userdetail[11])
-    for i in history:
-        print(i[2])
-        tuteeName = DatabaseInstance.executeSelectOneQueryWithParameters(
-            'SELECT FirstName FROM user WHERE UserID = (%s)',[i[2]])
-        historyList.append((tuteeName[0], i[7], i[11],i[13]))
+    userRole = UserInstance.getUser().getUserRole()
+    if userRole == 1:
+        pageTitle = "Tutee Managment"
+        userdetail = DatabaseInstance.executeSelectOneQueryWithParameters(
+            'SELECT * FROM user WHERE userID = (%s)', [tuteeID])
+        rating = DatabaseInstance.executeSelectOneQueryWithParameters(
+            'SELECT MAX(AvgRating) FROM user AS u LEFT JOIN (SELECT TutorID, feedbackid, Attendance FROM meeting) AS m ON u.UserID = m.TutorID LEFT JOIN (SELECT feedbackid, AVG(sessionrating) AS AvgRating FROM feedback) AS fb ON m.feedbackid = fb.feedbackid WHERE u.UserID = (%s) ORDER BY u.UserID ASC',[tuteeID])
+        history = DatabaseInstance.executeSelectMultipleQueryWithParameters(
+            #attendance change to 2 after demo
+            'SELECT * , TIMESTAMPDIFF(MINUTE, StartTime,EndTime) as Duration from meeting WHERE Attendance >= 0 AND TuteeID = (%s) ORDER BY meetingID DESC LIMIT 5',[tuteeID])
+        historyList = []
+        for i in history:
+            print(i[2])
+            tuteeName = DatabaseInstance.executeSelectOneQueryWithParameters(
+                'SELECT FirstName FROM user WHERE UserID = (%s)',[i[2]])
+            historyList.append((tuteeName[0], i[7], i[11],i[13]))
 
-    faculty = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT name from faculty where FacultyID = (%s)',[userdetail[8]]
-    )
+        faculty = DatabaseInstance.executeSelectOneQueryWithParameters(
+            'SELECT name from faculty where FacultyID = (%s)',[userdetail[8]]
+        )
 
-    gender = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT gender from gender where gender_id = (%s)',[userdetail[12]]
-    )
+        gender = DatabaseInstance.executeSelectOneQueryWithParameters(
+            'SELECT gender from gender where gender_id = (%s)',[userdetail[12]]
+        )
 
-    return render_template('admin_tutee.html', pageTitle=pageTitle, userdetail=userdetail, rating=rating, historyList=historyList, faculty=faculty[0], gender=gender[0])
+        return render_template('admin_tutee.html', pageTitle=pageTitle, userdetail=userdetail, rating=rating, historyList=historyList, faculty=faculty[0], gender=gender[0])
+    else:
+        return redirect(url_for('home'))
 
-def picDeCode(pic64):
+def decode_pic(pic64):
     if pic64:
         return b64encode(pic64).decode("utf-8")
     else:
         return ""
-
 
 def formatdt(date):
     if date:
@@ -817,8 +874,7 @@ def formatdt(date):
     else:
         return ""
 
-
 app.jinja_env.filters['formatdt'] = formatdt
-app.jinja_env.filters['picdecode'] = picDeCode
+app.jinja_env.filters['picdecode'] = decode_pic
 if __name__ == '__main__':
     app.run(debug=True)
