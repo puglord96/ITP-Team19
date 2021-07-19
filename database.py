@@ -36,23 +36,17 @@ class SingletonDatabase:
         myresult = cur.fetchall()
         return myresult
 
-    def getDetailListOfUser(self, email):
+    def getUserDetailsByEmail(self, email):
         cur = self.mysql.connection.cursor()
         cur.execute("SELECT * FROM user where email = '" + email+"'")
         myresult = cur.fetchone()
         return myresult
 
-    def getUserDetails(self, UserID):
+    def getUserDetailsByUserID(self, UserID):
         cur = self.mysql.connection.cursor()
         cur.execute("SELECT * FROM user WHERE userID = " + str(UserID))
         myresult = cur.fetchone()
         return myresult
-
-    def executeNonSelectQuery(self, query):
-        cur = self.mysql.connection.cursor()
-        cur.execute(query)
-        self.mysql.connection.commit()
-        cur.close()
 
     def executeSelectMultipleQuery(self, query):
         cur = self.mysql.connection.cursor()

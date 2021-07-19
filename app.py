@@ -48,7 +48,7 @@ def login():
 
         for user in userlist:
             if formEmail == user[0] and formPassword == user[1]:
-                userDetailList = DatabaseInstance.getDetailListOfUser(formEmail)
+                userDetailList = DatabaseInstance.getUserDetailsByEmail(formEmail)
                 user = UserFactory.createUser(userDetailList)
                 UserInstance.setUser(user)
                 zoomRole = UserInstance.getUser().getZoomRole()
@@ -632,7 +632,7 @@ def update_profile():
                         'UPDATE usertimeslotpreference SET {} = 1 WHERE UserID = {}'.format(DBtimeSlotList[int(i)],
                                                                                             user[0]))
 
-        userDetailList = DatabaseInstance.getUserDetails(str(user[0]))
+        userDetailList = DatabaseInstance.getUserDetailsByUserID(str(user[0]))
         user = UserFactory.createUser(userDetailList)
         UserInstance.setUser(user)
         return redirect('/profile')
