@@ -249,7 +249,6 @@ def feedback():
     print(meetingduration)
 
     if request.method == "POST":
-        feedbacktuteetutor = request.form.get('tutortuteename')
         feedbacksessionrating = request.form.get('sessionrating')
         feedbacktutortuteerating = request.form.get('tutortuteerating')
         feedbackremarks = request.form.get('remarks')
@@ -258,8 +257,8 @@ def feedback():
             DatabaseInstance.executeUpdateQueryWithParameters("update meeting set meetingtimeelapsed = %s where meetingid = %s",[meetingduration,meetingid])
 
         DatabaseInstance.executeInsertQueryWithParameters(
-            "Insert into feedback(sessionrating,tutortuteerating,remark,tutortuteeid,subjectrole) values(%s,%s,%s,%s,%s)",
-            [feedbacksessionrating, feedbacktutortuteerating, feedbackremarks, tutortuteenamearray[2], subjectRole])
+            "Insert into feedback(sessionrating,tutortuteerating,remark) values(%s,%s,%s)",
+            [feedbacksessionrating, feedbacktutortuteerating, feedbackremarks])
 
         DatabaseInstance.executeUpdateQuery(UserInstance.getUser().getUpdateFeedbackString(meetingid))
 
@@ -829,6 +828,17 @@ def tuteemanagment():
         return render_template('admin_tutee_management.html', pageTitle=pageTitle, tuteeList=tuteeList)
     else:
         return redirect(url_for('home'))
+
+@app.route('/admin/feedbackmanagement')
+def feedbackmanagement():
+
+    userRole = UserInstance.getUser().getUserRole()
+    if userRole == 1:
+        feedbackList = DatabaseInstance.executeSelectMultipleQuery("SELECT f.tutortuteerating,f.remark,concat(u.firstname,u.lastname) from feedback f, user u, meeting m where u.userid = m.TutorID and f.FeedBackID = m.FeedBackID")
+        return render_template('admin_feedback_management.html',feedbackList = feedbackList)
+    else:
+        return redirect(url_for('home'))
+
 
 
 @app.route('/admin/tutee/<tuteeID>')
