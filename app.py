@@ -83,6 +83,7 @@ def meeting_redirect():
 def session_booking():
     disciplinelist = DatabaseInstance.executeSelectMultipleQuery("Select name from degree")
     tutorTable = []
+    percentageTable = []
     if request.method == "POST":
         formExpertise = request.form.get('expertise')
         formDiscipline = request.form.get('discipline')
@@ -119,10 +120,10 @@ def session_booking():
 
         if not formGender:
             genderSearch = DatabaseInstance.executeSelectMultipleQuery("SELECT u.userid, u.firstname, u.lastname FROM user u, gender g "
-                                                                       "WHERE g.gender_id = u.gender ")
+                                                                       "WHERE g.genderid = u.gender ")
         else:
             genderSearch = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.userid, u.firstname, u.lastname FROM user u, gender g "
-                                                                                     "WHERE g.gender_id = u.gender AND g.gender = %s ", [formGender])
+                                                                                     "WHERE g.genderid = u.gender AND g.gender = %s ", [formGender])
         print("===Gender===")
         try:
             for row in genderSearch:
@@ -132,18 +133,11 @@ def session_booking():
             print("No Matches.")
 
         if not formRating:
-            # ratingSearch = DatabaseInstance.executeSelectMultipleQuery("SELECT u.userid, u.firstname, u.lastname FROM user u, feedback f "
-            #                                                            "WHERE f.tutortuteeid = u.UserID GROUP BY u.userid")
-            ratingSearch = DatabaseInstance.executeSelectMultipleQuery("SELECT UserID, FirstName, LastName FROM user AS u "
-                                                                       "LEFT JOIN (SELECT TutorID, feedbackid FROM meeting) AS m ON u.UserID = m.TutorID "
-                                                                       "LEFT JOIN (SELECT feedbackid, sessionrating AS AvgRating FROM feedback) AS fb ON m.feedbackid = fb.feedbackid "
-                                                                       "WHERE u.UserType = (2) GROUP BY u.UserID ORDER BY u.UserID ASC;")
-
+            ratingSearch = DatabaseInstance.executeSelectMultipleQuery("SELECT u.userid, u.firstname, u.lastname, AVG(SessionRating) as average FROM user u, feedback f, meeting m "
+                                                                       "WHERE f.feedbackid = m.feedbackid AND u.userid = m.TutorID GROUP BY u.userid ORDER BY average DESC ")
         else:
-            # ratingSearch = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.userid, u.firstname, u.lastname, AVG(tutortuteerating) AS average FROM user u, feedback f "
-            #                                                                          "WHERE f.tutortuteeid = u.UserID GROUP BY u.userid HAVING average >= %s ", [formRating])
-            ratingSearch = DatabaseInstance.executeSelectMultipleQueryWithParameters(
-                'SELECT UserID, FirstName, LastName, MAX(AvgRating) FROM user AS u LEFT JOIN (SELECT TutorID, feedbackid FROM meeting) AS m ON u.UserID = m.TutorID LEFT JOIN (SELECT feedbackid, AVG(sessionrating) AS AvgRating FROM feedback) AS fb ON m.feedbackid = fb.feedbackid WHERE u.UserType = (2) GROUP BY u.UserID HAVING AvgRating >= %s ORDER BY u.UserID ASC;', [formRating])
+            ratingSearch = DatabaseInstance.executeSelectMultipleQueryWithParameters("SELECT u.userid, u.firstname, u.lastname, AVG(SessionRating) as average FROM user u, feedback f, meeting m "
+                                                                                     "WHERE f.feedbackid = m.feedbackid AND u.userid = m.TutorID GROUP BY u.userid HAVING average >= %s ORDER BY average DESC ", [formRating])
         print("===Rating===")
         try:
             for row in ratingSearch:
@@ -154,9 +148,6 @@ def session_booking():
             print("No Matches.")
 
         print("===Ranking===")
-        # rankingList = frequency(expertiseSearchList, disciplineSearchList, genderSearchList, ratingSearchList)
-        # print(rankingList)
-        # print(Counter(rankingList))
         rankingList = [expertiseSearchList, disciplineSearchList, genderSearchList, ratingSearchList]
         frequencyList = frequency(expertiseSearchList, disciplineSearchList, genderSearchList, ratingSearchList)
         print(frequencyList)
@@ -164,10 +155,9 @@ def session_booking():
         for tutorID in frequencyList:
             tutorQuery = DatabaseInstance.executeSelectOneQueryWithParameters('SELECT UserID, ProfilePicture, FirstName, LastName, MAX(AvgRating) FROM user AS u LEFT JOIN (SELECT TutorID, feedbackid, Attendance FROM meeting) AS m ON u.UserID = m.TutorID LEFT JOIN (SELECT feedbackid, AVG(sessionrating) AS AvgRating FROM feedback) AS fb ON m.feedbackid = fb.feedbackid WHERE u.UserType = (2) AND u.UserID = %s GROUP BY u.UserID;', [tutorID])
             tutorTable.append(tutorQuery)
-            percentage = int(occurences[tutorID] / 5 * 100)
-            # tutorTable.append(percentage)
-        # print(tutorTable)
-        return render_template("session_booking_results.html", disciplinelist=disciplinelist, tutorTable=tutorTable)
+            percentageTable.append(int(occurences[tutorID] / 4 * 100))
+        print(tutorTable)
+        return render_template("session_booking.html", disciplinelist=disciplinelist, tables=zip(tutorTable, percentageTable))
     return render_template("session_booking.html", disciplinelist=disciplinelist)
 
 def frequency(*lists):
@@ -187,10 +177,10 @@ def tutorBooking(tutorID):
         EndTime = datetime.strptime(formEndTime,'%H:%M').time()
         formatStart = dt.combine(dt.today(), StartTime)
         formatEnd = dt.combine(dt.today(), EndTime)
-        print("%s %s"% (formatStart,formatEnd))
-        DatabaseInstance.executeInsertQueryWithParameters(
-            "INSERT INTO meeting (tutorID, tuteeID, meetingtypeID, statusID, StartTime, EndTime) VALUES (%s,%s,2,2,%s,%s)",
-            [tutorID, userID, formatStart, formatEnd])
+        # DatabaseInstance.executeInsertQueryWithParameters(
+        #     "INSERT INTO meeting (tutorID, tuteeID, meetingtypeID, statusID, StartTime, EndTime) VALUES (%s,%s,2,2,%s,%s)",
+        #     [tutorID, userID, formatStart, formatEnd])
+        return redirect('/home')
         # Sample Inser Statement
         # INSERT INTO `meeting` VALUES (1,2,3,1,1,'88600763699','2','2021-07-07 00:10:00','2021-07-07 01:00:00','',NULL,10,'Report','00:00:00')
 
@@ -200,8 +190,9 @@ def tutorBooking(tutorID):
     faculty = DatabaseInstance.executeSelectOneQueryWithParameters(
         'SELECT name from faculty where FacultyID = (%s)', [userdetail[8]]
     )
+
     gender = DatabaseInstance.executeSelectOneQueryWithParameters(
-        'SELECT gender from gender where gender_id = (%s)', [userdetail[12]]
+        'SELECT gender from gender where genderid = (%s)', [userdetail[12]]
     )
     appointments = DatabaseInstance.executeSelectMultipleQueryWithParameters(
         'SELECT StartTime, EndTime FROM meeting WHERE tutorID = (%s)', [tutorID]
@@ -216,7 +207,7 @@ def tutorBooking(tutorID):
     #                 (datetime(2012, 5, 22, 12), datetime(2012, 5, 22, 13)),
     #                 (datetime(2012, 5, 22, 15, 30), datetime(2012, 5, 22, 17, 10))]
 
-hours = (datetime(2021, 7, 7, 9, 0), datetime(2021, 7, 7, 18, 0))
+hours = (datetime(2021, 7, 19, 0, 0), datetime(2021, 7, 19, 18, 0))
 
 def get_slots(hours, appointments, duration=timedelta(hours=0.5)):
     slots = sorted([(hours[0], hours[0])] + appointments + [(hours[1], hours[1])])
@@ -226,7 +217,7 @@ def get_slots(hours, appointments, duration=timedelta(hours=0.5)):
         while start + duration <= end and len(slot) < 12:
             slot.append("{:%H:%M} - {:%H:%M}".format(start, start + duration))
             start += duration
-            # print(slot)
+        print(slot)
     return slot
 
 @app.route('/meeting')
@@ -500,7 +491,7 @@ def profile():
     expertisesList = ['Essay Writing', 'Technical Proposal', 'Oral Presentation', 'Reader Response', 'Reflection']
     timeSlotList = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
     gender = \
-    DatabaseInstance.executeSelectOneQueryWithParameters('Select gender from gender where gender_id = %s', [user[12]])[
+    DatabaseInstance.executeSelectOneQueryWithParameters('Select gender from gender where genderid = %s', [user[12]])[
         0]
     faculty = \
     DatabaseInstance.executeSelectOneQueryWithParameters('Select name from faculty where facultyid = %s', [user[8]])[0]
@@ -810,7 +801,7 @@ def adminTutor(tutorID):
         )
 
         gender = DatabaseInstance.executeSelectOneQueryWithParameters(
-            'SELECT gender from gender where gender_id = (%s)',[userdetail[12]]
+            'SELECT gender from gender where genderid = (%s)',[userdetail[12]]
         )
         return render_template('admin_tutor.html', pageTitle=pageTitle, userdetail=userdetail, rating=rating, historyList=historyList, faculty=faculty[0], gender=gender[0])
     else:
@@ -863,7 +854,7 @@ def adminTutee(tuteeID):
         )
 
         gender = DatabaseInstance.executeSelectOneQueryWithParameters(
-            'SELECT gender from gender where gender_id = (%s)',[userdetail[12]]
+            'SELECT gender from gender where genderid = (%s)',[userdetail[12]]
         )
 
         return render_template('admin_tutee.html', pageTitle=pageTitle, userdetail=userdetail, rating=rating, historyList=historyList, faculty=faculty[0], gender=gender[0])
