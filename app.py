@@ -420,12 +420,10 @@ def view_request(meetingid):
         userID = UserInstance.getUser().getUserID()
         # prevent injection of URL (make sure that tutor is tutor of the meeting)
         if userID == requestMeeting[0][1] and requestMeeting[0][4] == 2:
-            tutorname = DatabaseInstance.executeSelectMultipleQuery(
-                UserInstance.getUser().getUser(str(requestMeeting[0][1])))
-            tutorname = tutorname[0][0] + " " + tutorname[0][1]
-            tuteename = DatabaseInstance.executeSelectMultipleQuery(
-                UserInstance.getUser().getUser(str(requestMeeting[0][2])))
-            tuteename = tuteename[0][0] + " " + tuteename[0][1]
+            tutorname = DatabaseInstance.getUserDetailsByUserID(str(requestMeeting[0][1]))
+            tutorname = tutorname[4] + " " + tutorname[5]
+            tuteename = DatabaseInstance.getUserDetailsByUserID(str(requestMeeting[0][2]))
+            tuteename = tuteename[4] + " " + tuteename[5]
             meetingtype = DatabaseInstance.executeSelectMultipleQuery(
                 UserInstance.getUser().getMeetingType(str(requestMeeting[0][3])))
             meetingtype = meetingtype[0][0]
