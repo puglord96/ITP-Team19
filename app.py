@@ -81,6 +81,7 @@ def meeting_redirect():
 
 @app.route('/sessionbooking', methods=['GET','POST'])
 def session_booking():
+    global formExpertise
     disciplinelist = DatabaseInstance.executeSelectMultipleQuery("Select name from degree")
     tutorTable = []
     percentageTable = []
@@ -88,13 +89,13 @@ def session_booking():
         formExpertise = request.form.get('expertise')
         formDiscipline = request.form.get('discipline')
         formGender = request.form.get('gender')
-        formRating= request.form.get('rating')
+        formRating = request.form.get('rating')
         if not formExpertise:
             expertiseSearch = DatabaseInstance.executeSelectMultipleQuery("SELECT DISTINCT u.userid, u.firstname, u.lastname FROM user u, userexpertises e "
                                                                           "WHERE e.userid = u.userid ")
         else:
-            expertiseSearch = DatabaseInstance.executeSelectMultipleQuery("SELECT DISTINCT u.userid, u.firstname, u.lastname, e."+formExpertise+" FROM user u, userexpertises e "
-                                                                          "WHERE e.userid = u.userid AND e."+formExpertise+" = TRUE ")
+            expertiseSearch = DatabaseInstance.executeSelectMultipleQuery("SELECT DISTINCT u.userid, u.firstname, u.lastname, e."+formExpertise.replace(" ", "")+" FROM user u, userexpertises e "
+                                                                          "WHERE e.userid = u.userid AND e."+formExpertise.replace(" ", "")+" = TRUE ")
         print("===Expetise===")
         try:
             for row in expertiseSearch:
@@ -177,11 +178,11 @@ def tutorBooking(tutorID):
         EndTime = datetime.strptime(formEndTime,'%H:%M').time()
         formatStart = dt.combine(dt.today(), StartTime)
         formatEnd = dt.combine(dt.today(), EndTime)
-        # DatabaseInstance.executeInsertQueryWithParameters(
-        #     "INSERT INTO meeting (tutorID, tuteeID, meetingtypeID, statusID, StartTime, EndTime) VALUES (%s,%s,2,2,%s,%s)",
-        #     [tutorID, userID, formatStart, formatEnd])
+        DatabaseInstance.executeInsertQueryWithParameters(
+            "INSERT INTO meeting (tutorID, tuteeID, meetingtypeID, statusID, StartTime, EndTime, Topic) VALUES (%s,%s,2,2,%s,%s,%s)",
+            [tutorID, userID, formatStart, formatEnd, formExpertise])
         return redirect('/home')
-        # Sample Inser Statement
+        # Sample Insert Statement
         # INSERT INTO `meeting` VALUES (1,2,3,1,1,'88600763699','2','2021-07-07 00:10:00','2021-07-07 01:00:00','',NULL,10,'Report','00:00:00')
 
     pageTitle = "Tutor Booking"
