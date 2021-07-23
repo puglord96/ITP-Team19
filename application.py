@@ -1,15 +1,16 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, make_response
-from database import SingletonDatabase
-from UserSingleton import UserSingleton
-from scripts import tutor_calendar
-from pyzoom import ZoomClient
-from UserFactory import *
-from datetime import datetime as dt, timedelta
-from itertools import chain
+import os
+from base64 import b64encode
 from collections import defaultdict, Counter
 from datetime import datetime, timedelta
-from base64 import b64encode
-import os
+from datetime import datetime as dt
+from itertools import chain
+
+from flask import Flask, render_template, request, redirect, url_for, jsonify, make_response
+from pyzoom import ZoomClient
+
+from UserFactory import *
+from UserSingleton import UserSingleton
+from database import SingletonDatabase
 
 application = Flask(__name__)
 # Upload file size limit to 4GB
