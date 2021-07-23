@@ -748,11 +748,11 @@ def appointmentmanagement():
             meetingsarray = []
 
             meetingdate = meetings[4].date()
-            print(meetings)
-            tutorname = DatabaseInstance.executeSelectOneQueryWithParameters("select concat(firstname,' ',lastname) from user where userid = %s", [meetings[1]])
-            tuteename = DatabaseInstance.executeSelectOneQueryWithParameters("select concat(firstname,' ',lastname) from user where userid = %s", [meetings[2]])
-            meetingtype = DatabaseInstance.executeSelectOneQueryWithParameters("select description from meetingtype where meetingtypeid = %s", [meetings[5]])
-            meetingstatus = DatabaseInstance.executeSelectOneQueryWithParameters("select description from statustype where statusid = %s", [meetings[9]])
+
+            tutorname = DatabaseInstance.executeSelectOneQueryWithParameters("select concat(firstname,' ',lastname) from user where userid = %s", [meetings[1]])[0]
+            tuteename = DatabaseInstance.executeSelectOneQueryWithParameters("select concat(firstname,' ',lastname) from user where userid = %s", [meetings[2]])[0]
+            meetingtype = DatabaseInstance.executeSelectOneQueryWithParameters("select description from meetingtype where meetingtypeid = %s", [meetings[5]])[0]
+            meetingstatus = DatabaseInstance.executeSelectOneQueryWithParameters("select description from statustype where statusid = %s", [meetings[9]])[0]
             meetingsarray.append(meetings[0])
             meetingsarray.append(tutorname)
             meetingsarray.append(tuteename)
@@ -767,9 +767,10 @@ def appointmentmanagement():
             if meetingdate not in meetingsdict:
                 meetingsdict[meetingdate] = []
 
+
             meetingsdict[meetingdate].append(meetingsarray)
 
-        print(meetingsdict)
+
         return render_template('admin_appointments.html',meetingsdict=meetingsdict)
 
     else:
