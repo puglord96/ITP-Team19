@@ -11,11 +11,11 @@ from datetime import datetime, timedelta
 from base64 import b64encode
 import os
 
-app = Flask(__name__)
+application = Flask(__name__)
 # Upload file size limit to 4GB
-app.config['MAX_CONTENT_LENGTH'] = 4086 * 1024 * 1024
+application.config['MAX_CONTENT_LENGTH'] = 4086 * 1024 * 1024
 SECRET_KEY = os.urandom(24)
-app.secret_key = SECRET_KEY
+application.secret_key = SECRET_KEY
 
 client = ZoomClient('TSE_4EYwTrW6_uQYObr4Pg', 'i31hVKhUPjLO6JSp8tFB8DirYI7kauYKOZJF')
 
@@ -26,7 +26,7 @@ databaseUserName = 'admin'
 databasePassword = 'iloveitp'
 databaseName = 'itp'
 
-database = SingletonDatabase(app, databaseIP, databaseUserName, databasePassword, databaseName)
+database = SingletonDatabase(application, databaseIP, databaseUserName, databasePassword, databaseName)
 
 DatabaseInstance = database.get_instance()
 UserInstance = UserSingleton().get_instance()
@@ -38,7 +38,7 @@ UserFactory = UserFactory()
 # 1 - Admin
 # 2 - Tutor
 # 3 - Tutee
-@app.route('/', methods=['GET', 'POST'])
+@application.route('/', methods=['GET', 'POST'])
 def login():
     userlist = DatabaseInstance.executeSelectMultipleQuery("Select email,password from user")
     loginmsg = ""
@@ -63,12 +63,12 @@ def login():
     print(loginmsg)
     return render_template('login.html', loginmsg=loginmsg)
 
-@app.route('/logout')
+@application.route('/logout')
 def logout():
     UserInstance.removeUser()
     return redirect('/')
 
-@app.route('/meetingredirect')
+@application.route('/meetingredirect')
 def meeting_redirect():
     # Creating a meeting
     # meeting = client.meetings.create_meeting('Test Meeting', start_time=dt.now().isoformat(), duration_min=60,
@@ -79,7 +79,7 @@ def meeting_redirect():
     return render_template("zoom_meeting_test.html")
 
 
-@app.route('/sessionbooking', methods=['GET','POST'])
+@application.route('/sessionbooking', methods=['GET', 'POST'])
 def session_booking():
     global formExpertise
     disciplinelist = DatabaseInstance.executeSelectMultipleQuery("Select name from degree")
@@ -168,7 +168,7 @@ def frequency(*lists):
     return [key for (key, value) in
         sorted(counter.items(), key=lambda kv: (kv[1], kv[0]), reverse=True)]
 
-@app.route('/tutorBooking/<tutorID>', methods=['GET','POST'])
+@application.route('/tutorBooking/<tutorID>', methods=['GET', 'POST'])
 def tutorBooking(tutorID):
     if request.method == 'POST':
         userID = UserInstance.getUser().getUserID()
@@ -221,13 +221,13 @@ def get_slots(hours, appointments, duration=timedelta(hours=0.5)):
         print(slot)
     return slot
 
-@app.route('/meeting')
+@application.route('/meeting')
 def meeting():
     global meeting_starttime
     meeting_starttime = dt.now()
     return render_template("meeting.html")
 
-@app.route('/feedback', methods=['GET', 'POST'])
+@application.route('/feedback', methods=['GET', 'POST'])
 def feedback():
 
     tutortuteenamearray = DatabaseInstance.executeSelectOneQuery(UserInstance.getUser().getFeedbackSubjectNameString(request.cookies.get("meeting_id")))
@@ -257,7 +257,7 @@ def feedback():
         return redirect('/home')
     return render_template("feedback.html", tutortuteename=tutortuteename)
 
-@app.route('/home')
+@application.route('/home')
 def home():
     global upcomingmeetingslist, requestmeetingslist
     userID = UserInstance.getUser().getUserID()
@@ -329,7 +329,7 @@ def home():
     return resp
 
 
-@app.route('/tutor_upcoming_meeting')
+@application.route('/tutor_upcoming_meeting')
 def tutor_upcoming_meeting():
     userRole = UserInstance.getUser().getUserRole()
     if userRole == 2:
@@ -338,7 +338,7 @@ def tutor_upcoming_meeting():
     return render_template("error_page.html")
 
 
-@app.route('/tutor_upcoming_request')
+@application.route('/tutor_upcoming_request')
 def tutor_upcoming_request():
     userRole = UserInstance.getUser().getUserRole()
     if userRole == 2:
@@ -347,7 +347,7 @@ def tutor_upcoming_request():
     return render_template("error_page.html")
 
 
-@app.route('/view_meeting/<meetingid>')
+@application.route('/view_meeting/<meetingid>')
 def view_meeting(meetingid):
     # if request.method == "POST":
     #     if request.form.get('accept'):
@@ -388,7 +388,7 @@ def view_meeting(meetingid):
     return redirect(url_for('home'))
 
 
-@app.route('/view_request/<meetingid>', methods=['GET', 'POST'])
+@application.route('/view_request/<meetingid>', methods=['GET', 'POST'])
 def view_request(meetingid):
     if request.method == "POST":
         if request.form.get('accept'):
@@ -442,12 +442,12 @@ def view_request(meetingid):
 #     return redirect(url_for('tutor_test', meetingid=meetingid))
 
 
-@app.route('/forgot_password')
+@application.route('/forgot_password')
 def forgot_password():
     return render_template('forgot_password.html')
 
 
-@app.route('/register', methods=['GET', 'POST'])
+@application.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == "POST":
         formEmail = request.form.get('email')
@@ -470,7 +470,7 @@ def register():
     return render_template('register.html', facultyList=facultyList,genderList = genderList)
 
 
-@app.route('/register/faculty/<Faculty>')
+@application.route('/register/faculty/<Faculty>')
 def degree_by_faculty(Faculty):
     degreeList = DatabaseInstance.executeSelectMultipleQueryWithParameters(
         'SELECT * FROM degree WHERE FacultyID = (%s) ORDER BY DegreeID ASC', [Faculty])
@@ -483,7 +483,7 @@ def degree_by_faculty(Faculty):
     return jsonify({'degreeList': degreeArray})
 
 
-@app.route('/profile')
+@application.route('/profile')
 def profile():
     user = UserInstance.getUser().getDetailsList()
     userRole = UserInstance.getUser().getUserRole()
@@ -541,7 +541,7 @@ def profile():
     return landingswitch.get(userRole, render_template('error_page.html'))
 
 
-@app.route('/updateprofile', methods=['GET', 'POST'])
+@application.route('/updateprofile', methods=['GET', 'POST'])
 def update_profile():
     user = UserInstance.getUser().getDetailsList()
     if request.method == "POST":
@@ -725,7 +725,7 @@ def adminhrsly():
                            popularRequest=popularRequest[0], dataTotalApp=dataTotalApp, dataComApp=dataComApp)
 
 
-@app.route('/admin/tutormanagment')
+@application.route('/admin/tutormanagment')
 def tutormanagment():
     userRole = UserInstance.getUser().getUserRole()
     if userRole == 1:
@@ -737,7 +737,7 @@ def tutormanagment():
         return redirect(url_for('home'))
 
 
-@app.route('/admin/appointmentmanagement')
+@application.route('/admin/appointmentmanagement')
 def appointmentmanagement():
     userRole = UserInstance.getUser().getUserRole()
     if userRole == 1:
@@ -748,11 +748,11 @@ def appointmentmanagement():
             meetingsarray = []
 
             meetingdate = meetings[4].date()
-            tutorname = DatabaseInstance.executeSelectOneQueryWithParameters("select concat(firstname,' ',lastname) from user where userid = %s", str(meetings[1]))[0]
-            tuteename = DatabaseInstance.executeSelectOneQueryWithParameters("select concat(firstname,' ',lastname) from user where userid = %s", str(meetings[2]))[0]
-            meetingtype = DatabaseInstance.executeSelectOneQueryWithParameters("select description from meetingtype where meetingtypeid = %s", str(meetings[5]))[0]
-            meetingstatus = DatabaseInstance.executeSelectOneQueryWithParameters("select description from statustype where statusid = %s", str(meetings[9]))[0]
-
+            print(meetings)
+            tutorname = DatabaseInstance.executeSelectOneQueryWithParameters("select concat(firstname,' ',lastname) from user where userid = %s", [meetings[1]])
+            tuteename = DatabaseInstance.executeSelectOneQueryWithParameters("select concat(firstname,' ',lastname) from user where userid = %s", [meetings[2]])
+            meetingtype = DatabaseInstance.executeSelectOneQueryWithParameters("select description from meetingtype where meetingtypeid = %s", [meetings[5]])
+            meetingstatus = DatabaseInstance.executeSelectOneQueryWithParameters("select description from statustype where statusid = %s", [meetings[9]])
             meetingsarray.append(meetings[0])
             meetingsarray.append(tutorname)
             meetingsarray.append(tuteename)
@@ -779,7 +779,7 @@ def appointmentmanagement():
 
 
 
-@app.route('/admin/tutor/<tutorID>')
+@application.route('/admin/tutor/<tutorID>')
 def adminTutor(tutorID):
     userRole = UserInstance.getUser().getUserRole()
     if userRole == 1:
@@ -808,7 +808,7 @@ def adminTutor(tutorID):
     else:
         return redirect(url_for('home'))
 
-@app.route('/admin/tuteemanagment')
+@application.route('/admin/tuteemanagment')
 def tuteemanagment():
     userRole = UserInstance.getUser().getUserRole()
     if userRole == 1:
@@ -819,7 +819,7 @@ def tuteemanagment():
     else:
         return redirect(url_for('home'))
 
-@app.route('/admin/feedbackmanagement')
+@application.route('/admin/feedbackmanagement')
 def feedbackmanagement():
 
     userRole = UserInstance.getUser().getUserRole()
@@ -831,7 +831,7 @@ def feedbackmanagement():
 
 
 
-@app.route('/admin/tutee/<tuteeID>')
+@application.route('/admin/tutee/<tuteeID>')
 def adminTutee(tuteeID):
     userRole = UserInstance.getUser().getUserRole()
     if userRole == 1:
@@ -874,7 +874,7 @@ def formatdt(date):
     else:
         return ""
 
-app.jinja_env.filters['formatdt'] = formatdt
-app.jinja_env.filters['picdecode'] = decode_pic
+application.jinja_env.filters['formatdt'] = formatdt
+application.jinja_env.filters['picdecode'] = decode_pic
 if __name__ == '__main__':
-    app.run(debug=True)
+    application.run(debug=True)
